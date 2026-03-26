@@ -1,8 +1,10 @@
 package com.projetofullstack.workspace_hub.controllers;
 
-import com.projetofullstack.workspace_hub.model.dto.LoginRequest;
-import com.projetofullstack.workspace_hub.model.dto.LoginResponse;
+import com.projetofullstack.workspace_hub.model.dto.request.LoginRequest;
+import com.projetofullstack.workspace_hub.model.dto.response.LoginResponse;
 import com.projetofullstack.workspace_hub.model.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(description = "Serviço responsavel por controlar a autenticação de usuarios e sessão!", name = "Serviço de autenticação")
 public class AuthController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @PostMapping("/login")
+    @Operation(description = "Valida se o email e senha informados consta no banco de dados", summary = "Login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
         if (loginRequest.email().equals("alexbaranoski08@gmail.com") && loginRequest.senha().equals("1234")){
             return ResponseEntity.ok(new LoginResponse("tokensuperseguro"));
