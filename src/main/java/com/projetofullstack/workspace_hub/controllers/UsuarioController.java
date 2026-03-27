@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.controllers;
 
+import com.projetofullstack.workspace_hub.model.dto.request.UsuarioAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.model.entities.Usuario;
 import com.projetofullstack.workspace_hub.model.repository.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,20 @@ public class UsuarioController {
 
             repository.save(usuarioBanco);
 
+            return ResponseEntity.ok("Atualizado com sucesso!");
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/status")
+    @Operation(summary = "Atualizar status", description = "Atualiza status do usuario com id informado no parametro")
+    public ResponseEntity<?> alterarStatus(@PathVariable Long id, @RequestBody UsuarioAlterarStatusRequest request){
+        var usuario = repository.findById(id).orElse(null);
+
+        if (usuario != null){
+            usuario.setStatus(request.status());
+            repository.save(usuario);
             return ResponseEntity.ok("Atualizado com sucesso!");
         }
 
