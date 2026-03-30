@@ -21,6 +21,6 @@ public class Cliente {
     private String nome;
     private String documento;
     private String telefone;
-    private StatusCliente status;
+    private StatusCliente status = StatusCliente.ATIVO;
 
 }

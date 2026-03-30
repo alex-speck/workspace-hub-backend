@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.controllers;
 
+import com.projetofullstack.workspace_hub.model.dto.request.EspacoAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.model.dto.request.EspacoRequest;
 import com.projetofullstack.workspace_hub.model.dto.response.EspacoResponse;
 import com.projetofullstack.workspace_hub.model.entities.Espaco;
@@ -57,6 +58,20 @@ public class EspacoController {
             espaco.setValorHora(request.valorHora());
 
             return ResponseEntity.ok(new EspacoResponse(espacoRepository.save(espaco)));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/status")
+    @Operation(summary = "Atualizar status entrega", description = "Atualiza o status da entrega")
+    public ResponseEntity<EspacoResponse> atualizarStatus(@PathVariable Long id, @RequestBody EspacoAlterarStatusRequest request){
+        var espaco = espacoRepository.findById(id).orElse(null);
+
+        if (espaco != null){
+            espaco.setStatus(request.status());
+
+            return ResponseEntity.ok(new EspacoResponse(espaco));
         }
 
         return ResponseEntity.notFound().build();
