@@ -59,7 +59,7 @@ public class ClienteController {
             cliente.setDocumento(request.documento());
             cliente.setTelefone(request.telefone());
 
-            return ResponseEntity.ok(new ClienteResponse(cliente));
+            return ResponseEntity.ok(new ClienteResponse(clienteRepository.save(cliente)));
         }
 
         return ResponseEntity.notFound().build();
@@ -73,7 +73,7 @@ public class ClienteController {
         if (cliente != null){
             cliente.setStatus(request.status());
 
-            return ResponseEntity.ok(new ClienteResponse(cliente));
+            return ResponseEntity.ok(new ClienteResponse(clienteRepository.save(cliente)));
         }
 
         return ResponseEntity.notFound().build();
