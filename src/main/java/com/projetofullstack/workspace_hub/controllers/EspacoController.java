@@ -77,4 +77,19 @@ public class EspacoController {
         return ResponseEntity.notFound().build();
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar espaço", description = "Não apaga os dados do espaço do banco apenas seta o status para DELETADO")
+    public ResponseEntity<?> deletarPorId(@PathVariable Long id){
+        var espaco = espacoRepository.findById(id).orElse(null);
+
+        if (espaco != null){
+            espaco.setStatus(StatusEspaco.DELETADO);
+            espacoRepository.save(espaco);
+
+            return ResponseEntity.ok("Deletado com sucesso!");
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
 }
