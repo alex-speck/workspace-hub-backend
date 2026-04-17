@@ -29,10 +29,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-resources")
+                || request.getMethod().startsWith("OPTIONS")
         ){
             filterChain.doFilter(request, response);
             return;
         }
+
 
         String header = request.getHeader("Authorization");
 
