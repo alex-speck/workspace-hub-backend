@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.config;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.projetofullstack.workspace_hub.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -42,11 +43,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String token = header.replace("Bearer ", "");
 
-            var retornoToken = tokenService.validarToken(token);
+            try{
+                var retornoToken = tokenService.validarToken(token);
 
-            String username = retornoToken.getSubject();
+                String username = retornoToken.getSubject();
 
-            System.out.println("Usuario autenticado! " + username);
+                System.out.println("Usuario autenticado! " + username);
+            }catch (TokenExpiredException ex){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expirado");
+
+                System.out.println("Token expirado! " + ex.getMessage());
+                return;
+            }
 
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
