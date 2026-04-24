@@ -5,8 +5,10 @@ import com.projetofullstack.workspace_hub.model.entities.Usuario;
 import com.projetofullstack.workspace_hub.model.repository.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +32,14 @@ public class UsuarioController {
     @Operation(summary = "Buscar por ID", description = "Busca o usuario pela id passada como parametro, caso não encontrar devolve null")
     public ResponseEntity<Usuario> buscarPorId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(repository.findById(id).orElse(null));
+    }
+
+    @GetMapping("/logado")
+    @Operation(summary = "Consultar usuario logado", description = "Busca usuario logado pelo token enviado")
+    public ResponseEntity<Usuario> buscarUsuarioLogado(Authentication auth){
+        Usuario usuario = (Usuario) auth.getPrincipal();
+
+        return ResponseEntity.ok(repository.findById(usuario.getId()).orElse(null));
     }
 
     @PostMapping

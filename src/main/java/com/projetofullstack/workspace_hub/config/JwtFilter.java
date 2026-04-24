@@ -7,10 +7,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -44,11 +48,16 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.replace("Bearer ", "");
 
             try{
-                var retornoToken = tokenService.validarToken(token);
 
-                String username = retornoToken.getSubject();
+                var usuarioLogado = tokenService.validarToken(token);
 
-                System.out.println("Usuario autenticado! " + username);
+                UsernamePasswordAuthenticationToken usuario = new UsernamePasswordAuthenticationToken(
+                        usuarioLogado,
+                        null,
+                        usuarioLogado.getAuthorities()
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(usuario);
             }catch (TokenExpiredException ex){
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token expirado");

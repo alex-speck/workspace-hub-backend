@@ -4,6 +4,7 @@ import com.projetofullstack.workspace_hub.model.dto.request.LoginRequest;
 import com.projetofullstack.workspace_hub.model.dto.response.LoginResponse;
 import com.projetofullstack.workspace_hub.model.repository.UsuarioRepository;
 import com.projetofullstack.workspace_hub.services.TokenService;
+import com.projetofullstack.workspace_hub.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.antlr.v4.runtime.Token;
@@ -23,12 +24,12 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
     @PostMapping("/login")
     @Operation(description = "Valida se o email e senha informados consta no banco de dados", summary = "Login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
-        if (loginRequest.email().equals("alexbaranoski08@gmail.com") && loginRequest.senha().equals("1234")){
+        if (usuarioService.validarUsuarioSenha(loginRequest)){
             var token = tokenService.gerarToken(loginRequest.email());
 
             return ResponseEntity.ok(new LoginResponse(token));

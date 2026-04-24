@@ -1,14 +1,12 @@
 package com.projetofullstack.workspace_hub.model.repository;
 
-import com.projetofullstack.workspace_hub.model.entities.Usuario;
+import com.projetofullstack.workspace_hub.model.entities.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-
-    boolean existsUsuarioByEmailAndSenha(String email, String senha);
-
+public interface TokenRepository extends JpaRepository<Token, Long> {
+    Optional<Token> findTokenByToken(String token);
 }
