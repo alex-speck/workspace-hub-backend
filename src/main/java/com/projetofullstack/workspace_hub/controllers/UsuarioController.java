@@ -1,11 +1,13 @@
 package com.projetofullstack.workspace_hub.controllers;
 
 import com.projetofullstack.workspace_hub.model.dto.request.UsuarioAlterarStatusRequest;
+import com.projetofullstack.workspace_hub.model.dto.response.UsuarioLogadoResponse;
 import com.projetofullstack.workspace_hub.model.entities.Usuario;
+import com.projetofullstack.workspace_hub.model.enums.StatusUsuario;
 import com.projetofullstack.workspace_hub.model.repository.UsuarioRepository;
+import com.projetofullstack.workspace_hub.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,31 +17,37 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
-@Tag(name = "Serviço de controle de usuarios", description = "Serviço responsavel por controlar o CRUD de usuarios do sistema")
+@Tag(name = "ServiÃ§o de controle de usuarios", description = "ServiÃ§o responsavel por controlar o CRUD de usuarios do sistema")
 public class UsuarioController {
 
     @Autowired
     private UsuarioRepository repository;
 
+    @Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping
-    @Operation(summary = "Listar Todos", description = "Rota chamada para listar todos os usuarios existentes no banco, retorna um array vazio se não houver usuarios")
+    @Operation(summary = "Listar Todos", description = "Rota chamada para listar todos os usuarios existentes no banco, retorna um array vazio se nÃ£o houver usuarios")
     public ResponseEntity<List<Usuario>> listarTodos() {
         return ResponseEntity.ok(repository.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar por ID", description = "Busca o usuario pela id passada como parametro, caso não encontrar devolve null")
+    @Operation(summary = "Buscar por ID", description = "Busca o usuario pela id passada como parametro, caso nÃ£o encontrar devolve null")
     public ResponseEntity<Usuario> buscarPorId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(repository.findById(id).orElse(null));
     }
 
     @GetMapping("/logado")
     @Operation(summary = "Consultar usuario logado", description = "Busca usuario logado pelo token enviado")
-    public ResponseEntity<Usuario> buscarUsuarioLogado(Authentication auth){
+    public ResponseEntity<UsuarioLogadoResponse> buscarUsuarioLogado(Authentication auth){
         Usuario usuario = (Usuario) auth.getPrincipal();
 
-        return ResponseEntity.ok(repository.findById(usuario.getId()).orElse(null));
+        if (usuario != null && usuario.getStatus() == StatusUsuario.ATIVO) {
+            return ResponseEntity.ok(usuarioService.buscarUsuarioLogado(usuario.getId()));
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
@@ -49,7 +57,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar por ID", description = "Atualiza o usuario com o id passado por parametro usando os dados enviados no body, retorna 404 caso o usuario não existir")
+    @Operation(summary = "Atualizar por ID", description = "Atualiza o usuario com o id passado por parametro usando os dados enviados no body, retorna 404 caso o usuario nÃ£o existir")
     public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @RequestBody Usuario usuario){
         var usuarioBanco = repository.findById(id).orElse(null);
 
@@ -80,5 +88,4 @@ public class UsuarioController {
 
         return ResponseEntity.notFound().build();
     }
-
 }

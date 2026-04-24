@@ -25,7 +25,7 @@ public class Empresa {
     private String email;
     private String telefone;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "empresa")
     private List<Usuario> usuarios;
 
 }
