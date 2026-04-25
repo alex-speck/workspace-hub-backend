@@ -1,6 +1,5 @@
 package com.projetofullstack.workspace_hub.services;
 
-import com.projetofullstack.workspace_hub.model.dto.request.CriarUsuarioRequest;
 import com.projetofullstack.workspace_hub.model.dto.request.RegistroEmpresaRequest;
 import com.projetofullstack.workspace_hub.model.entities.Empresa;
 import com.projetofullstack.workspace_hub.model.entities.Usuario;

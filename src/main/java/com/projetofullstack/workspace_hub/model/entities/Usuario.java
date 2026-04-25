@@ -29,7 +29,7 @@ public class Usuario implements UserDetails {
     private StatusUsuario status = StatusUsuario.ATIVO;
     private String role;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
