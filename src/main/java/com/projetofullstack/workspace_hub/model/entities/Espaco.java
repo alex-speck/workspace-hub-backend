@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "espacos")
 @Data
@@ -22,5 +24,8 @@ public class Espaco {
     private TipoEspaco tipo;
     private Double valorHora;
     private StatusEspaco status = StatusEspaco.DISPONIVEL;
+
+    @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservas;
 
 }
