@@ -21,8 +21,10 @@ public class Espaco {
     private Long id;
 
     private String nomeNumero;
+    @Enumerated(EnumType.STRING)
     private TipoEspaco tipo;
     private Double valorHora;
+    @Enumerated(EnumType.STRING)
     private StatusEspaco status = StatusEspaco.DISPONIVEL;
 
     @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)

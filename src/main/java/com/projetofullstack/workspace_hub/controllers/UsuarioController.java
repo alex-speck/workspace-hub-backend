@@ -54,12 +54,14 @@ public class UsuarioController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar por ID", description = "Atualiza o usuario com o id passado por parametro usando os dados enviados no body, retorna 404 caso o usuario não existir")
     public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @RequestBody AtualizarUsuarioRequest request){
-        return usuarioService.atualizarUsuario(id, request) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        usuarioService.atualizarUsuario(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/status")
     @Operation(summary = "Atualizar status", description = "Atualiza status do usuario com id informado no parametro")
     public ResponseEntity<?> alterarStatus(@PathVariable Long id, @RequestBody UsuarioAlterarStatusRequest request){
-        return usuarioService.atualizarStatusUsuario(id, request) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        usuarioService.atualizarStatusUsuario(id, request);
+        return ResponseEntity.ok().build();
     }
 }

@@ -23,6 +23,7 @@ public class Cliente {
     private String nome;
     private String documento;
     private String telefone;
+    @Enumerated(EnumType.STRING)
     private StatusCliente status = StatusCliente.ATIVO;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -45,13 +45,15 @@ public class ClienteController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar dados do cliente", description = "Atualiza os dados do cliente excluindo o status")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody ClienteRequest request){
-        return clienteService.atualizarCliente(id, request) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        clienteService.atualizarCliente(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/status")
     @Operation(summary = "Atualizar status cliente", description = "Atualiza o status da cliente")
     public ResponseEntity<?> atualizarStatus(@PathVariable Long id, @RequestBody ClienteAlterarStatusRequest request){
-        return clienteService.atualizarStatusCliente(id, request) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        clienteService.atualizarStatusCliente(id, request);
+        return ResponseEntity.ok().build();
     }
 
 }

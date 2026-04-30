@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.services;
 
+import com.projetofullstack.workspace_hub.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.model.dto.request.AtualizarUsuarioRequest;
 import com.projetofullstack.workspace_hub.model.dto.request.CriarUsuarioRequest;
 import com.projetofullstack.workspace_hub.model.dto.request.LoginRequest;
@@ -37,7 +38,7 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public UsuarioLogadoResponse buscarUsuarioLogado(Long id) {
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado"));
 
         return new UsuarioLogadoResponse(usuario, usuario.getEmpresa());
     }
@@ -52,7 +53,7 @@ public class UsuarioService {
 
 
     public UsuarioResponse buscarPorId(Long id) {
-        return repository.findById(id).map(UsuarioResponse::new).orElseThrow(() -> new RuntimeException("Usuario não encontrado!"));
+        return repository.findById(id).map(UsuarioResponse::new).orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado!"));
     }
 
     public UsuarioResponse salvarNovoUsuario(CriarUsuarioRequest request) {
@@ -65,29 +66,23 @@ public class UsuarioService {
     }
 
     public boolean atualizarUsuario(Long id, AtualizarUsuarioRequest request) {
-        var usuarioBanco = repository.findById(id).orElse(null);
+        var usuarioBanco = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado"));
 
-        if (usuarioBanco != null) {
-            usuarioBanco.setEmail(request.email());
-            usuarioBanco.setNome(request.nome());
+        usuarioBanco.setEmail(request.email());
+        usuarioBanco.setNome(request.nome());
 
-            repository.save(usuarioBanco);
+        repository.save(usuarioBanco);
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     public boolean atualizarStatusUsuario(Long id, UsuarioAlterarStatusRequest request) {
-        var usuario = repository.findById(id).orElse(null);
+        var usuario = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado"));
 
-        if (usuario != null) {
-            usuario.setStatus(request.status());
-            repository.save(usuario);
-            return true;
-        }
-
-        return false;
+        usuario.setStatus(request.status());
+        repository.save(usuario);
+        return true;
     }
 }

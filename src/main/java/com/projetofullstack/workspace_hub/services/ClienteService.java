@@ -1,6 +1,7 @@
 package com.projetofullstack.workspace_hub.services;
 
 
+import com.projetofullstack.workspace_hub.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.model.dto.request.ClienteAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.model.dto.request.ClienteRequest;
 import com.projetofullstack.workspace_hub.model.dto.response.ClienteResponse;
@@ -27,11 +28,7 @@ public class ClienteService {
     }
 
     public ClienteResponse buscarPorId(Long id) {
-        try {
-            return repository.findById(id).map(ClienteResponse::new).orElseThrow(() -> new RuntimeException("Cliente não encontrado!"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return repository.findById(id).map(ClienteResponse::new).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
     }
 
     public ClienteResponse criarCliente(ClienteRequest request) {
@@ -43,38 +40,24 @@ public class ClienteService {
     }
 
     public boolean atualizarCliente(Long id, ClienteRequest request) {
-        try {
-            var cliente = repository.findById(id).orElse(null);
+        var cliente = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
 
-            if (cliente != null) {
-                cliente.setNome(request.nome());
-                cliente.setDocumento(request.documento());
-                cliente.setTelefone(request.telefone());
+        cliente.setNome(request.nome());
+        cliente.setDocumento(request.documento());
+        cliente.setTelefone(request.telefone());
 
-                repository.save(cliente);
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        repository.save(cliente);
+        return true;
     }
 
     public boolean atualizarStatusCliente(Long id, ClienteAlterarStatusRequest request) {
-        try {
-            var cliente = repository.findById(id).orElse(null);
+        var cliente = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
 
-            if (cliente != null){
-                cliente.setStatus(request.status());
+        cliente.setStatus(request.status());
 
-                repository.save(cliente);
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        repository.save(cliente);
+        return true;
     }
 }

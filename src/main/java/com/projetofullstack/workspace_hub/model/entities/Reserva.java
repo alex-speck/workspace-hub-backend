@@ -25,6 +25,7 @@ public class Reserva {
 
     private Double valorHora;
     private Double valorTotal;
+    @Enumerated(EnumType.STRING)
     private StatusReserva status = StatusReserva.ABERTA;
 
     @ManyToOne

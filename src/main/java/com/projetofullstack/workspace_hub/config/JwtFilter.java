@@ -1,6 +1,7 @@
 package com.projetofullstack.workspace_hub.config;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.projetofullstack.workspace_hub.exceptions.InvalidSessionException;
 import com.projetofullstack.workspace_hub.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -60,12 +61,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(usuario);
-            }catch (TokenExpiredException ex){
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token expirado");
-
-                System.out.println("Token expirado! " + ex.getMessage());
-                return;
+            }catch (Exception ex){
+                throw new InvalidSessionException("Token expirado ou inválido");
             }
 
         } else {

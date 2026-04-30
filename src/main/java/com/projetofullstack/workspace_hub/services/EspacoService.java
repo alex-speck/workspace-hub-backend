@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.services;
 
+import com.projetofullstack.workspace_hub.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.model.dto.request.EspacoAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.model.dto.request.EspacoRequest;
 import com.projetofullstack.workspace_hub.model.dto.response.EspacoResponse;
@@ -27,11 +28,7 @@ public class EspacoService {
     }
 
     public EspacoResponse buscarPorId(Long id) {
-        try {
-            return repository.findById(id).map(EspacoResponse::new).orElseThrow(() -> new RuntimeException("Espaço não encontrado!"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return repository.findById(id).map(EspacoResponse::new).orElseThrow(() -> new ResourceNotFoundException("Espaço não encontrado!"));
     }
 
     public void salvarEspaco(EspacoRequest request) {
@@ -44,58 +41,34 @@ public class EspacoService {
     }
 
     public boolean atualizarEspaco(Long id, EspacoRequest request) {
+        var espaco = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Espaço não encontrado!"));
 
-        try {
-            var espaco = repository.findById(id).orElse(null);
+        espaco.setNomeNumero(request.nomeNumero());
+        espaco.setTipo(request.tipo());
+        espaco.setValorHora(request.valorHora());
 
-            if (espaco != null){
-                espaco.setNomeNumero(request.nomeNumero());
-                espaco.setTipo(request.tipo());
-                espaco.setValorHora(request.valorHora());
-
-                repository.save(espaco);
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        repository.save(espaco);
+        return true;
     }
 
     public boolean atualizarStatusEspaco(Long id, EspacoAlterarStatusRequest request) {
+        var espaco = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Espaço não encontrado!"));
 
-        try {
-            var espaco = repository.findById(id).orElse(null);
+        espaco.setStatus(request.status());
+        repository.save(espaco);
 
-            if (espaco != null){
-                espaco.setStatus(request.status());
-                repository.save(espaco);
-
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return true;
     }
 
     public boolean deletarEspacoPorId(Long id) {
+        var espaco = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Espaço não encontrado!"));
 
-        try {
-            var espaco = repository.findById(id).orElse(null);
+        espaco.setStatus(StatusEspaco.DELETADO);
+        repository.save(espaco);
 
-            if (espaco != null){
-                espaco.setStatus(StatusEspaco.DELETADO);
-                repository.save(espaco);
-
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return true;
     }
 }

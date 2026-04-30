@@ -46,19 +46,22 @@ public class EspacoController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar espaço", description = "Atualiza o espaço com id informado no parametro, retorna 404 caso não exista")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody EspacoRequest request){
-        return espacoService.atualizarEspaco(id, request) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        espacoService.atualizarEspaco(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/status")
     @Operation(summary = "Atualizar status entrega", description = "Atualiza o status da entrega")
     public ResponseEntity<?> atualizarStatus(@PathVariable Long id, @RequestBody EspacoAlterarStatusRequest request){
-        return espacoService.atualizarStatusEspaco(id, request) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        espacoService.atualizarStatusEspaco(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar espaço", description = "Não apaga os dados do espaço do banco apenas seta o status para DELETADO")
     public ResponseEntity<?> deletarPorId(@PathVariable Long id){
-        return espacoService.deletarEspacoPorId(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        espacoService.deletarEspacoPorId(id);
+        return ResponseEntity.ok().build();
     }
 
 }
