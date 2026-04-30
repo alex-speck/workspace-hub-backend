@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.projetofullstack.workspace_hub.exceptions.InvalidSessionException;
 import com.projetofullstack.workspace_hub.model.entities.Token;
 import com.projetofullstack.workspace_hub.model.entities.Usuario;
 import com.projetofullstack.workspace_hub.model.repository.TokenRepository;
@@ -36,15 +37,19 @@ public class TokenService {
     private UsuarioRepository usuarioRepository;
 
     public Usuario validarToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
-        JWTVerifier verifier = JWT.require(algorithm)
-                .withIssuer(emissor)
-                .build();
-        verifier.verify(token);
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer(emissor)
+                    .build();
+            verifier.verify(token);
 
-        return repository.findTokenByToken(token)
-                .orElseThrow(()-> new RuntimeException("Token invalido!"))
-                .getUsuario();
+            return repository.findTokenByToken(token)
+                    .orElseThrow(()-> new InvalidSessionException("Token invalido!"))
+                    .getUsuario();
+        } catch (Exception e) {
+            throw new InvalidSessionException("Token invalido ou expirado!");
+        }
 
     }
 
