@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -41,7 +42,7 @@ public class Reserva {
             throw new IllegalArgumentException("Datas de início e fim da reserva são obrigatórias para calcular o valor total.");
         }
 
-        long duracaoEmHoras = ChronoUnit.HOURS.between(this.dataHoraInicio, this.dataHoraFim);
+        double duracaoEmHoras = Duration.between(this.dataHoraInicio, this.dataHoraFim).toMinutes() / 60.0;
         this.valorTotal = duracaoEmHoras * this.valorHora;
     }
 
