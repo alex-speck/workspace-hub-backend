@@ -61,7 +61,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.projetofullstack.workspacehub.desktop/com.projetofullstack.workspacehub.desktop.HelloApplication
+                                com.projetofullstack.workspacehub.desktop/com.projetofullstack.workspacehub.desktop.WorkspaceApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

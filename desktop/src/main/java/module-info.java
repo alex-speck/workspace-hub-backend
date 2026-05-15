@@ -5,4 +5,6 @@ module com.projetofullstack.workspacehub.desktop {
 
     opens com.projetofullstack.workspacehub.desktop to javafx.fxml;
     exports com.projetofullstack.workspacehub.desktop;
+    exports com.projetofullstack.workspacehub.desktop.controllers;
+    opens com.projetofullstack.workspacehub.desktop.controllers to javafx.fxml;
 }
