@@ -35,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || request.getMethod().startsWith("OPTIONS")
                 || path.startsWith("/webjars")
                 || path.startsWith("/auth/cadastro")
+                || path.startsWith("/usuarios/admin")
         ){
             filterChain.doFilter(request, response);
             return;

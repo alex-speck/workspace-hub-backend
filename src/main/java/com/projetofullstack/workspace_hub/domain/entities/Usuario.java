@@ -30,6 +30,12 @@ public class Usuario implements UserDetails {
     private StatusUsuario status = StatusUsuario.ATIVO;
     private String role;
 
+    private String cep;
+    private String logradouro;
+    private String bairro;
+    private String localidade;
+    private String uf;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;

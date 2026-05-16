@@ -3,11 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.projetofullstack.workspacehub.desktop.controllers.MenuController">
    <children>
-      <Button layoutX="524.0" layoutY="14.0" mnemonicParsing="false" text="Logout" />
-      <Button layoutX="239.0" layoutY="129.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="122.0" text="Cadastrar Usuario" />
-      <Button layoutX="239.0" layoutY="168.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="122.0" text="Cadastrar Algo" />
+      <Button onAction="#onVoltarButtonClick" layoutX="524.0" layoutY="14.0" mnemonicParsing="false" text="Logout" />
+      <Button onAction="#onCadastroUsuarioButtonClick" layoutX="239.0" layoutY="129.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="122.0" text="Cadastrar Usuario" />
    </children>
 </AnchorPane>

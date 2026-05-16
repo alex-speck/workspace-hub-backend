@@ -1,6 +1,7 @@
 package com.projetofullstack.workspace_hub.presentation;
 
 import com.projetofullstack.workspace_hub.application.dto.request.AtualizarUsuarioRequest;
+import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioAdminRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.UsuarioAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogadoResponse;
@@ -63,5 +64,11 @@ public class UsuarioController {
     public ResponseEntity<?> alterarStatus(@PathVariable Long id, @RequestBody UsuarioAlterarStatusRequest request){
         usuarioService.atualizarStatusUsuario(id, request);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/admin")
+    @Operation(summary = "Criar usuario", description = "Cria e salva usuario com base nos dados enviado pelo body, devolve o ID do usuario cadastrado")
+    public ResponseEntity<UsuarioResponse> salvarAdmin(@RequestBody CriarUsuarioAdminRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.salvarUsuarioAdmin(request));
     }
 }

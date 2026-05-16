@@ -1,15 +1,13 @@
 package com.projetofullstack.workspace_hub.application.services;
 
+import com.projetofullstack.workspace_hub.application.dto.request.*;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
-import com.projetofullstack.workspace_hub.application.dto.request.AtualizarUsuarioRequest;
-import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioRequest;
-import com.projetofullstack.workspace_hub.application.dto.request.LoginRequest;
-import com.projetofullstack.workspace_hub.application.dto.request.UsuarioAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogadoResponse;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioResponse;
 import com.projetofullstack.workspace_hub.domain.entities.Usuario;
 import com.projetofullstack.workspace_hub.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,9 @@ import java.util.List;
 
 @Service
 public class UsuarioService {
+
+    @Value("${spring.security.jwt.secret}")
+    private String secret;
 
     @Autowired
     private UsuarioRepository repository;
@@ -84,5 +85,14 @@ public class UsuarioService {
         usuario.setStatus(request.status());
         repository.save(usuario);
         return true;
+    }
+
+    public UsuarioResponse salvarUsuarioAdmin(CriarUsuarioAdminRequest request) {
+
+        if (!request.secretKey().equals(secret)){
+            return new UsuarioResponse(0L, "", "", null);
+        }
+
+        return new UsuarioResponse(repository.save(request.toUsuario()));
     }
 }
