@@ -43,6 +43,7 @@ public class UsuarioController {
     @Operation(summary = "Consultar usuario logado", description = "Busca usuario logado pelo token enviado")
     public ResponseEntity<UsuarioLogadoResponse> buscarUsuarioLogado(Authentication auth){
         Usuario usuario = (Usuario) auth.getPrincipal();
+
         return usuario != null && usuario.getStatus() == StatusUsuario.ATIVO ? ResponseEntity.ok(usuarioService.buscarUsuarioLogado(usuario.getId())) : ResponseEntity.notFound().build();
     }
 
@@ -67,7 +68,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/admin")
-    @Operation(summary = "Criar usuario", description = "Cria e salva usuario com base nos dados enviado pelo body, devolve o ID do usuario cadastrado")
+    @Operation(summary = "Criar usuario admin", description = "Cria e salva usuario com base nos dados enviado pelo body automaticamente salva como admin, devolve o ID do usuario cadastrado")
     public ResponseEntity<UsuarioResponse> salvarAdmin(@RequestBody CriarUsuarioAdminRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.salvarUsuarioAdmin(request));
     }

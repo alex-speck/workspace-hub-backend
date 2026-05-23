@@ -2,11 +2,13 @@ package com.projetofullstack.workspace_hub.domain.entities;
 
 
 import com.projetofullstack.workspace_hub.domain.enums.StatusUsuario;
+import com.projetofullstack.workspace_hub.domain.valueobjects.CPF;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -25,6 +27,8 @@ public class Usuario implements UserDetails {
 
     private String nome;
     private String email;
+    @Embedded
+    private CPF cpf;
     private String senha;
     @Enumerated(EnumType.STRING)
     private StatusUsuario status = StatusUsuario.ATIVO;
@@ -39,6 +43,10 @@ public class Usuario implements UserDetails {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
+
+    public Usuario(){
+        var usuarioLogado = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

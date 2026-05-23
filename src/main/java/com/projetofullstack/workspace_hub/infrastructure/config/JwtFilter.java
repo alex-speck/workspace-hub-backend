@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.infrastructure.config;
 
+import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogado;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.InvalidSessionException;
 import com.projetofullstack.workspace_hub.application.services.TokenService;
 import jakarta.servlet.FilterChain;
@@ -53,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 var usuarioLogado = tokenService.validarToken(token);
 
                 UsernamePasswordAuthenticationToken usuario = new UsernamePasswordAuthenticationToken(
-                        usuarioLogado,
+                        new UsuarioLogado(usuarioLogado),
                         null,
                         usuarioLogado.getAuthorities()
                 );
