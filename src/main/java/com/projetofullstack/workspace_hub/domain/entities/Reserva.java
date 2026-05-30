@@ -37,6 +37,10 @@ public class Reserva {
     @JoinColumn(name = "espaco_id")
     private Espaco espaco;
 
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
     public void calcularValorTotal() {
         if (this.dataHoraInicio == null || this.dataHoraFim == null) {
             throw new IllegalArgumentException("Datas de início e fim da reserva são obrigatórias para calcular o valor total.");

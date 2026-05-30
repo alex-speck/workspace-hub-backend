@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
+public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     boolean existsEmpresaByCnpj(String cnpj);
 }

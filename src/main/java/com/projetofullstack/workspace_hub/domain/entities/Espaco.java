@@ -30,4 +30,8 @@ public class Espaco {
     @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reserva> reservas;
 
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
 }

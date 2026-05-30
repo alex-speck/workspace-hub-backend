@@ -1,6 +1,7 @@
 package com.projetofullstack.workspace_hub.domain.entities;
 
 
+import com.projetofullstack.workspace_hub.application.dto.request.ClienteRequest;
 import com.projetofullstack.workspace_hub.domain.enums.StatusCliente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,14 @@ public class Cliente {
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reserva> reservas;
 
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
+    public Cliente(ClienteRequest request, Empresa empresa) {
+        this.nome = request.nome();
+        this.documento = request.documento();
+        this.telefone = request.telefone();
+        this.empresa = empresa;
+    }
 }

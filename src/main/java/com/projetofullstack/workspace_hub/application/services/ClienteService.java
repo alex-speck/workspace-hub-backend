@@ -1,12 +1,17 @@
 package com.projetofullstack.workspace_hub.application.services;
 
 
+import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogado;
+import com.projetofullstack.workspace_hub.domain.entities.Cliente;
+import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.application.dto.request.ClienteAlterarStatusRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.ClienteRequest;
 import com.projetofullstack.workspace_hub.application.dto.response.ClienteResponse;
 import com.projetofullstack.workspace_hub.domain.repository.ClienteRepository;
+import com.projetofullstack.workspace_hub.infrastructure.providers.UsuarioLogadoProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +22,17 @@ public class ClienteService {
     @Autowired
     private ClienteRepository repository;
 
+    @Autowired
+    private EmpresaRepository empresaRepository;
+
     public List<ClienteResponse> listarTodos() {
         try {
+            UsuarioLogado usuarioLogado = UsuarioLogadoProvider.getUsuarioLogado();
+
+            if (!usuarioLogado.role().equals("ADMIN") && usuarioLogado.empresaId() != null) {
+                return repository.findAllByEmpresaId(usuarioLogado.empresaId()).stream().map(ClienteResponse::new).toList();
+            }
+
             return repository.findAll().stream().map(ClienteResponse::new).toList();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -31,7 +45,8 @@ public class ClienteService {
 
     public ClienteResponse criarCliente(ClienteRequest request) {
         try {
-            return new ClienteResponse(repository.save(request.toCliente()));
+            var empresa = empresaRepository.getReferenceById(UsuarioLogadoProvider.getUsuarioLogado().empresaId());
+            return new ClienteResponse(repository.save(new Cliente(request, empresa)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

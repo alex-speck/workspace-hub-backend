@@ -44,9 +44,6 @@ public class Usuario implements UserDetails {
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
-    public Usuario(){
-        var usuarioLogado = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
