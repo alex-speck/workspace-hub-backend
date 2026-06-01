@@ -5,7 +5,9 @@ import com.projetofullstack.workspace_hub.domain.enums.StatusReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +21,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     Optional<Reserva> findByIdAndEmpresaId(Long id, Long empresaId);
 
-    boolean existsByEspacoIdAndStatusAndDataHoraInicioBeforeAndDataHoraFimAfter(Long espacoId, StatusReserva status, LocalDateTime dataHoraFim, LocalDateTime dataHoraInicio);
-
-    boolean existsByEspacoIdAndStatusAndDataHoraInicioBeforeAndDataHoraFimAfterAndEmpresaId(Long espacoId, StatusReserva status, LocalDateTime dataHoraFim, LocalDateTime dataHoraInicio, Long empresaId);
+    boolean existsByEspacoIdAndStatusAndDataAndHoraInicioBeforeAndHoraFimAfterAndEmpresaId(Long espacoId, StatusReserva status, LocalDate data, LocalTime horaFim, LocalTime horaInicio, Long empresaId);
 }

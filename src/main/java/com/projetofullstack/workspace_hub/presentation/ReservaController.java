@@ -2,6 +2,7 @@ package com.projetofullstack.workspace_hub.presentation;
 
 import com.projetofullstack.workspace_hub.application.dto.request.ReservaRequest;
 import com.projetofullstack.workspace_hub.application.dto.response.ReservaResponse;
+import com.projetofullstack.workspace_hub.application.dto.response.ReservaResumoResponse;
 import com.projetofullstack.workspace_hub.application.services.ReservaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +23,7 @@ public class ReservaController {
 
     @GetMapping
     @Operation(summary = "Obter todas as reservas", description = "Retorna uma lista com todas as reservas cadastradas")
-    public ResponseEntity<List<ReservaResponse>> listarTodas(){
+    public ResponseEntity<ReservaResumoResponse> listarTodas(){
         return ResponseEntity.ok(reservaService.listarTodasReservas());
     }
 
@@ -34,7 +35,7 @@ public class ReservaController {
 
     @GetMapping("/cliente/{id}")
     @Operation(summary = "Obter reservas por cliente", description = "Retorna uma lista de reservas associadas a um cliente específico")
-    public ResponseEntity<List<ReservaResponse>> listarReservasPorCliente(@PathVariable Long id){
+    public ResponseEntity<ReservaResumoResponse> listarReservasPorCliente(@PathVariable Long id){
         return ResponseEntity.ok(reservaService.listarReservasPorCliente(id));
     }
 

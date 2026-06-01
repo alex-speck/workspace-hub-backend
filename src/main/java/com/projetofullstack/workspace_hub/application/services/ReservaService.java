@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.application.services;
 
+import com.projetofullstack.workspace_hub.application.dto.response.ReservaResumoResponse;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.BusinessException;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.application.dto.request.ReservaRequest;
@@ -17,8 +18,11 @@ import com.projetofullstack.workspace_hub.infrastructure.providers.UsuarioLogado
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
@@ -35,7 +39,7 @@ public class ReservaService {
     public ReservaResponse criarReserva(ReservaRequest request) {
         var empresaId = UsuarioLogadoProvider.getUsuarioLogado().empresaId();
 
-        if (this.reservaExiste(request.dataHoraInicio(), request.dataHoraFim(), request.espacoId(), empresaId)) {
+        if (this.reservaExiste(request.data(), request.horaInicio(), request.horaFim(), request.espacoId(), empresaId)) {
             throw new BusinessException("Já existe uma reserva nesse horário para esse espaço");
         }
 
@@ -67,28 +71,53 @@ public class ReservaService {
         reservaRepository.save(reserva);
     }
 
-    public List<ReservaResponse> listarTodasReservas() {
+    public ReservaResumoResponse listarTodasReservas() {
         UsuarioLogado usuarioLogado = UsuarioLogadoProvider.getUsuarioLogado();
+        var hoje = LocalDate.now();
 
         if (!usuarioLogado.role().equals("ADMIN") && usuarioLogado.empresaId() != null) {
-            return reservaRepository.findAllByEmpresaId(usuarioLogado.empresaId()).stream().map(ReservaResponse::new).toList();
+            var reservas = reservaRepository.findAllByEmpresaId(usuarioLogado.empresaId()).stream().map(ReservaResponse::new).toList();
+
+            return new ReservaResumoResponse(
+                    reservas.stream().filter(r -> r.data().isEqual(hoje)).toList(),
+                    reservas.stream().filter(r -> r.data().isAfter(hoje)).toList()
+            );
         }
 
-        return reservaRepository.findAll().stream().map(ReservaResponse::new).toList();
+        var reservas = reservaRepository.findAll().stream().map(ReservaResponse::new).toList();
+
+        return new ReservaResumoResponse(
+                reservas.stream().filter(r -> r.data().isEqual(hoje)).toList(),
+                reservas.stream().filter(r -> r.data().isAfter(hoje)).toList()
+        );
     }
 
-    public List<ReservaResponse> listarReservasPorCliente(Long clienteId) {
+    public ReservaResumoResponse listarReservasPorCliente(Long clienteId) {
         var empresaId = UsuarioLogadoProvider.getUsuarioLogado().empresaId();
+        var hoje = LocalDate.now();
+
         if (empresaId != null) {
-            return reservaRepository.findByClienteIdAndEmpresaId(clienteId, empresaId).stream().map(ReservaResponse::new).toList();
+            var reservas = reservaRepository.findByClienteIdAndEmpresaId(clienteId, empresaId).stream().map(ReservaResponse::new).toList();
+            return new ReservaResumoResponse(
+                    reservas.stream().filter(r -> r.data().isEqual(hoje)).toList(),
+                    reservas.stream().filter(r -> r.data().isAfter(hoje)).toList()
+            );
         }
-        return reservaRepository.findByClienteId(clienteId).stream().map(ReservaResponse::new).toList();
+        var reservas = reservaRepository.findByClienteId(clienteId).stream().map(ReservaResponse::new).toList();
+        return new ReservaResumoResponse(
+                reservas.stream().filter(r -> r.data().isEqual(hoje)).toList(),
+                reservas.stream().filter(r -> r.data().isAfter(hoje)).toList()
+        );
     }
 
-    private boolean reservaExiste(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim, Long espacoId, Long empresaId) {
-        if (empresaId != null) {
-            return reservaRepository.existsByEspacoIdAndStatusAndDataHoraInicioBeforeAndDataHoraFimAfterAndEmpresaId(espacoId, StatusReserva.ABERTA, dataHoraFim, dataHoraInicio, empresaId);
-        }
-        return reservaRepository.existsByEspacoIdAndStatusAndDataHoraInicioBeforeAndDataHoraFimAfter(espacoId, StatusReserva.ABERTA, dataHoraFim, dataHoraInicio);
+    private boolean reservaExiste(LocalDate data, LocalTime horaInicio, LocalTime horaFim, Long espacoId, Long empresaId) {
+        return reservaRepository.existsByEspacoIdAndStatusAndDataAndHoraInicioBeforeAndHoraFimAfterAndEmpresaId(
+                espacoId,
+                StatusReserva.ABERTA,
+                data,
+                horaFim,
+                horaInicio,
+                empresaId
+        );
     }
 }

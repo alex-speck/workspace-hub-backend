@@ -8,8 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "reservas")
@@ -22,8 +22,9 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime dataHoraInicio;
-    private LocalDateTime dataHoraFim;
+    private LocalDate data;
+    private LocalTime horaInicio;
+    private LocalTime horaFim;
 
     private Double valorHora;
     private Double valorTotal;
@@ -33,7 +34,6 @@ public class Reserva {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
-
     @ManyToOne
     @JoinColumn(name = "espaco_id")
     private Espaco espaco;
@@ -43,8 +43,14 @@ public class Reserva {
     private Empresa empresa;
 
     public Reserva(ReservaRequest request, Cliente cliente, Espaco espaco, Empresa empresa) {
-        this.dataHoraInicio = request.dataHoraInicio();
-        this.dataHoraFim = request.dataHoraFim();
+
+        if(request.horaFim().isBefore(request.horaInicio())){
+            throw new IllegalArgumentException("Hora final deve ser maior que a hora inicial");
+        }
+
+        this.data = request.data();
+        this.horaInicio = request.horaInicio();
+        this.horaFim = request.horaFim();
         this.cliente = cliente;
         this.espaco = espaco;
         this.empresa = empresa;
@@ -53,11 +59,7 @@ public class Reserva {
     }
 
     public void calcularValorTotal() {
-        if (this.dataHoraInicio == null || this.dataHoraFim == null) {
-            throw new IllegalArgumentException("Datas de início e fim da reserva são obrigatórias para calcular o valor total.");
-        }
-
-        double duracaoEmHoras = Duration.between(this.dataHoraInicio, this.dataHoraFim).toMinutes() / 60.0;
+        double duracaoEmHoras = Duration.between(this.horaInicio, this.horaFim).toMinutes() / 60.0;
         this.valorTotal = duracaoEmHoras * this.valorHora;
     }
 
