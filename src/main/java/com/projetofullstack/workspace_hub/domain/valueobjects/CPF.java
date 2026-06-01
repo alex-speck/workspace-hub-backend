@@ -1,38 +1,41 @@
 package com.projetofullstack.workspace_hub.domain.valueobjects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
+@Embeddable
+@NoArgsConstructor
 public class CPF {
 
-    private String cpf;
+    @Column(name = "cpf")
+    private String valor;
 
-    public CPF(){
-        this.cpf = "";
+    public CPF(String valor) {
+        if (valor == null) {
+            throw new IllegalArgumentException("CPF não pode ser nulo!");
+        }
+        String cleanValor = valor.replaceAll("[^0-9]", "");
+        if (!isValid(cleanValor)) {
+            throw new IllegalArgumentException("CPF inválido!");
+        }
+        this.valor = cleanValor;
     }
 
-    public CPF(String cpf){
-
-        if(cpf == null || !isValid(cpf)) throw new IllegalArgumentException("CPF invalido!");
-
-        this.cpf = cpf;
+    public String getValor() {
+        return valor;
     }
 
-    private String getNumeros(){
-        return this.cpf.replaceAll("[^0-9]", "");
-    }
-
-    private boolean isValid(String cpf){
-        String cpfTratado = cpf.replaceAll("[^0-9]", "");
-
-        if (cpfTratado.length() != 11 || cpfTratado.matches("(\\d)\\1{10}")) {
+    private boolean isValid(String cpf) {
+        if (cpf.length() != 11 || cpf.matches("(\\d)\\1{10}")) {
             return false;
         }
-
-
-        return validarDigitosVerificadores(cpfTratado);
+        return validarDigitosVerificadores(cpf);
     }
 
-    private boolean validarDigitosVerificadores(String cpf){
-
+    private boolean validarDigitosVerificadores(String cpf) {
         int soma = 0;
         int peso = 10;
         for (int i = 0; i < 9; i++) {
@@ -59,12 +62,19 @@ public class CPF {
         int cpfDigito2 = Character.getNumericValue(cpf.charAt(10));
 
         return (digito1 == cpfDigito1 && digito2 == cpfDigito2);
-
     }
 
+    public String toFormattedString() {
+        return valor.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+    }
+
+    public String toMaskedString() {
+        return valor.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.***.***-$4");
+    }
 
     @Override
     public String toString() {
-        return cpf.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+        return toFormattedString();
     }
+
 }

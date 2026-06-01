@@ -1,5 +1,7 @@
 package com.projetofullstack.workspace_hub.domain.entities;
 
+import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpresaRequest;
+import com.projetofullstack.workspace_hub.domain.valueobjects.CNPJ;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,11 +23,21 @@ public class Empresa {
 
     private String razaoSocial;
     private String nomeFantasia;
-    private String cnpj;
+    @Embedded
+    @Column(name = "cnpj")
+    private CNPJ cnpj;
     private String email;
     private String telefone;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "empresa")
     private List<Usuario> usuarios;
+
+    public Empresa(RegistroEmpresaRequest request) {
+        this.razaoSocial = request.razaoSocial();
+        this.nomeFantasia = request.nomeFantasia();
+        this.cnpj = new CNPJ(request.cnpj());
+        this.email = request.email();
+        this.telefone = request.telefone();
+    }
 
 }

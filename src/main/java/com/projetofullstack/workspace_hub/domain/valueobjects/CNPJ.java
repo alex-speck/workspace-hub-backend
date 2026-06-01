@@ -1,29 +1,41 @@
 package com.projetofullstack.workspace_hub.domain.valueobjects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import lombok.NoArgsConstructor;
+
+import java.util.Objects;
+
+@Embeddable
+@NoArgsConstructor
 public class CNPJ {
 
+    @Column(name = "cnpj")
     private String valor;
 
-    public CNPJ(String cnpj){
-        if (cnpj == null || isValid(cnpj)) throw new IllegalArgumentException("CNPJ Invalido!");
-
-        this.valor = cnpj;
+    public CNPJ(String valor) {
+        if (valor == null) {
+            throw new IllegalArgumentException("CNPJ não pode ser nulo!");
+        }
+        String cleanValor = valor.replaceAll("[^0-9]", "");
+        if (!isValid(cleanValor)) {
+            throw new IllegalArgumentException("CNPJ inválido!");
+        }
+        this.valor = cleanValor;
     }
 
-
-
+    public String getValor() {
+        return valor;
+    }
 
     private boolean isValid(String cnpj) {
-        String cnpjTratado = cnpj.replaceAll("[^0-9]", "");
+        if (cnpj.length() != 14 || cnpj.matches("^(\\d)\\1{13}$")) return false;
 
-        if (cnpjTratado.length() != 14 || cnpjTratado.matches("^(\\d)\\1{13}$")) return false;
-
-        return validarDigitosVerificadores(cnpjTratado);
+        return validarDigitosVerificadores(cnpj);
     }
 
-
     private boolean validarDigitosVerificadores(String cnpj) {
-
         int[] pesosDigito1 = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
         int[] pesosDigito2 = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
 
@@ -51,11 +63,35 @@ public class CNPJ {
         return digito1 == cnpjDigito1 && digito2 == cnpjDigito2;
     }
 
-    @Override
-    public String toString() {
+    public String toFormattedString() {
         return valor.replaceAll(
                 "(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})",
                 "$1.$2.$3/$4-$5"
         );
+    }
+
+    public String toMaskedString() {
+        return valor.replaceAll(
+                "(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})",
+                "$1.***.***/$4-$5"
+        );
+    }
+
+    @Override
+    public String toString() {
+        return toFormattedString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CNPJ cnpj = (CNPJ) o;
+        return Objects.equals(valor, cnpj.valor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(valor);
     }
 }

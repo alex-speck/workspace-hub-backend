@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.domain.entities;
 
+import com.projetofullstack.workspace_hub.application.dto.request.EspacoRequest;
 import com.projetofullstack.workspace_hub.domain.enums.StatusEspaco;
 import com.projetofullstack.workspace_hub.domain.enums.TipoEspaco;
 import jakarta.persistence.*;
@@ -33,5 +34,12 @@ public class Espaco {
     @ManyToOne
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
+
+    public Espaco(EspacoRequest request, Empresa empresa) {
+        this.nomeNumero = request.nomeNumero();
+        this.tipo = request.tipo();
+        this.valorHora = request.valorHora();
+        this.empresa = empresa;
+    }
 
 }

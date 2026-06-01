@@ -8,12 +8,4 @@ public record EspacoRequest(
         TipoEspaco tipo,
         Double valorHora
 ) {
-    public Espaco toEspaco(){
-        Espaco retorno = new Espaco();
-        retorno.setNomeNumero(nomeNumero());
-        retorno.setTipo(tipo());
-        retorno.setValorHora(valorHora());
-
-        return retorno;
-    }
 }

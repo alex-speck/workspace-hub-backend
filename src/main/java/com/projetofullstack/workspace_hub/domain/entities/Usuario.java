@@ -1,6 +1,8 @@
 package com.projetofullstack.workspace_hub.domain.entities;
 
 
+import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioAdminRequest;
+import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioRequest;
 import com.projetofullstack.workspace_hub.domain.enums.StatusUsuario;
 import com.projetofullstack.workspace_hub.domain.valueobjects.CPF;
 import jakarta.persistence.*;
@@ -27,22 +29,30 @@ public class Usuario implements UserDetails {
 
     private String nome;
     private String email;
-    @Embedded
-    private CPF cpf;
     private String senha;
     @Enumerated(EnumType.STRING)
     private StatusUsuario status = StatusUsuario.ATIVO;
     private String role;
 
-    private String cep;
-    private String logradouro;
-    private String bairro;
-    private String localidade;
-    private String uf;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
+
+    public Usuario(CriarUsuarioRequest request, Empresa empresa) {
+        this.nome = request.nome();
+        this.email = request.email();
+        this.senha = request.senha();
+        this.role = "USER";
+        this.empresa = empresa;
+    }
+
+    public Usuario(CriarUsuarioAdminRequest request) {
+        this.nome = request.nome();
+        this.email = request.email();
+        this.senha = request.senha();
+        this.role = "ADMIN";
+    }
 
 
     @Override

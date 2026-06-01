@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.domain.entities;
 
+import com.projetofullstack.workspace_hub.application.dto.request.ReservaRequest;
 import com.projetofullstack.workspace_hub.domain.enums.StatusReserva;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,16 @@ public class Reserva {
     @ManyToOne
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
+
+    public Reserva(ReservaRequest request, Cliente cliente, Espaco espaco, Empresa empresa) {
+        this.dataHoraInicio = request.dataHoraInicio();
+        this.dataHoraFim = request.dataHoraFim();
+        this.cliente = cliente;
+        this.espaco = espaco;
+        this.empresa = empresa;
+        this.valorHora = espaco.getValorHora();
+        this.calcularValorTotal();
+    }
 
     public void calcularValorTotal() {
         if (this.dataHoraInicio == null || this.dataHoraFim == null) {

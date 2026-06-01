@@ -4,6 +4,7 @@ import com.projetofullstack.workspace_hub.application.dto.request.AtualizarUsuar
 import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioAdminRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.CriarUsuarioRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.UsuarioAlterarStatusRequest;
+import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogado;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogadoResponse;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioResponse;
 import com.projetofullstack.workspace_hub.domain.entities.Usuario;
@@ -42,9 +43,9 @@ public class UsuarioController {
     @GetMapping("/logado")
     @Operation(summary = "Consultar usuario logado", description = "Busca usuario logado pelo token enviado")
     public ResponseEntity<UsuarioLogadoResponse> buscarUsuarioLogado(Authentication auth){
-        Usuario usuario = (Usuario) auth.getPrincipal();
+        UsuarioLogado usuario = (UsuarioLogado) auth.getPrincipal();
 
-        return usuario != null && usuario.getStatus() == StatusUsuario.ATIVO ? ResponseEntity.ok(usuarioService.buscarUsuarioLogado(usuario.getId())) : ResponseEntity.notFound().build();
+        return usuario != null ? ResponseEntity.ok(usuarioService.buscarUsuarioLogado(usuario.id())) : ResponseEntity.notFound().build();
     }
 
     @PostMapping

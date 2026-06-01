@@ -4,6 +4,7 @@ import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpres
 import com.projetofullstack.workspace_hub.domain.entities.Empresa;
 import com.projetofullstack.workspace_hub.domain.entities.Usuario;
 import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
+import com.projetofullstack.workspace_hub.domain.valueobjects.CNPJ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,18 +23,13 @@ public class EmpresaService {
 
     public void cadastrarEmpresa(RegistroEmpresaRequest request){
 
-        if(empresaRepository.existsEmpresaByCnpj(request.cnpj())){
+        if(empresaRepository.existsEmpresaByCnpj(new CNPJ(request.cnpj()))){
             throw new IllegalArgumentException("CNPJ já cadastrado");
         }
 
-        Empresa empresa = new Empresa();
-        empresa.setRazaoSocial(request.razaoSocial());
-        empresa.setNomeFantasia(request.nomeFantasia());
-        empresa.setCnpj(request.cnpj());
-        empresa.setEmail(request.email());
-        empresa.setTelefone(request.telefone());
+        Empresa empresa = new Empresa(request);
 
-        Usuario usuarioPadrao = request.usuarioPadrao().toUsuario();
+        Usuario usuarioPadrao = new Usuario(request.usuarioPadrao(), empresa);
         usuarioPadrao.setRole("GESTOR");
         usuarioPadrao.setSenha(passwordEncoder.encode(usuarioPadrao.getSenha()));
         usuarioPadrao.setEmpresa(empresa);

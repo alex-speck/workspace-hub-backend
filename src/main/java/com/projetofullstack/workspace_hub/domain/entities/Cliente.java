@@ -3,6 +3,7 @@ package com.projetofullstack.workspace_hub.domain.entities;
 
 import com.projetofullstack.workspace_hub.application.dto.request.ClienteRequest;
 import com.projetofullstack.workspace_hub.domain.enums.StatusCliente;
+import com.projetofullstack.workspace_hub.domain.valueobjects.CPFCNPJ;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,9 @@ public class Cliente {
     private Long id;
 
     private String nome;
-    private String documento;
+    @Embedded
+    @Column(name = "documento")
+    private CPFCNPJ documento;
     private String telefone;
     @Enumerated(EnumType.STRING)
     private StatusCliente status = StatusCliente.ATIVO;
@@ -36,7 +39,7 @@ public class Cliente {
 
     public Cliente(ClienteRequest request, Empresa empresa) {
         this.nome = request.nome();
-        this.documento = request.documento();
+        this.documento = new CPFCNPJ(request.documento());
         this.telefone = request.telefone();
         this.empresa = empresa;
     }

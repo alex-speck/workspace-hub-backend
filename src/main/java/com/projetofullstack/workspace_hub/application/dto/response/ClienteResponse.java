@@ -11,6 +11,6 @@ public record ClienteResponse(
         StatusCliente status
 ) {
     public ClienteResponse(Cliente cliente){
-        this(cliente.getId(), cliente.getNome(), cliente.getTelefone(), cliente.getDocumento(), cliente.getStatus());
+        this(cliente.getId(), cliente.getNome(), cliente.getTelefone(), cliente.getDocumento().getValor(), cliente.getStatus());
     }
 }
