@@ -6,6 +6,7 @@ import com.projetofullstack.workspace_hub.application.dto.response.ClienteRespon
 import com.projetofullstack.workspace_hub.application.services.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class ClienteController {
 
     @PostMapping
     @Operation(summary = "Criar cliente", description = "Cria um usuario com base nos dados informados no corpo da requisição")
-    public ResponseEntity<ClienteResponse> criar(@RequestBody ClienteRequest request){
+    public ResponseEntity<ClienteResponse> criar(@RequestBody @Valid ClienteRequest request){
         return ResponseEntity.ok(clienteService.criarCliente(request));
     }
 

@@ -6,6 +6,7 @@ import com.projetofullstack.workspace_hub.application.dto.response.ReservaResumo
 import com.projetofullstack.workspace_hub.application.services.ReservaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,6 @@ public class ReservaController {
     @Autowired
     private ReservaService reservaService;
 
-
     @GetMapping
     @Operation(summary = "Obter todas as reservas", description = "Retorna uma lista com todas as reservas cadastradas")
     public ResponseEntity<ReservaResumoResponse> listarTodas(){
@@ -29,7 +29,7 @@ public class ReservaController {
 
     @PostMapping
     @Operation(summary = "Criar uma nova reserva", description = "Cria uma nova reserva de espaço de trabalho")
-    public ResponseEntity<?> criarReserva(@RequestBody ReservaRequest request){
+    public ResponseEntity<?> criarReserva(@RequestBody @Valid ReservaRequest request){
         return ResponseEntity.ok(reservaService.criarReserva(request));
     }
 

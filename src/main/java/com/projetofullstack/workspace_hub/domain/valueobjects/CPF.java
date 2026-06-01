@@ -10,7 +10,6 @@ import java.util.Objects;
 @NoArgsConstructor
 public class CPF {
 
-    @Column(name = "cpf")
     private String valor;
 
     public CPF(String valor) {

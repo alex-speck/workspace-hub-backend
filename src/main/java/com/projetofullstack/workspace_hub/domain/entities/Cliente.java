@@ -27,6 +27,7 @@ public class Cliente {
     @Column(name = "documento")
     private CPFCNPJ documento;
     private String telefone;
+    private String email;
     @Enumerated(EnumType.STRING)
     private StatusCliente status = StatusCliente.ATIVO;
 
@@ -38,6 +39,7 @@ public class Cliente {
     private Empresa empresa;
 
     public Cliente(ClienteRequest request, Empresa empresa) {
+        this.email = request.email();
         this.nome = request.nome();
         this.documento = new CPFCNPJ(request.documento());
         this.telefone = request.telefone();
