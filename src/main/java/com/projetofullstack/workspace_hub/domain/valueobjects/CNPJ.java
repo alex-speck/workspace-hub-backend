@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.domain.valueobjects;
 
+import com.projetofullstack.workspace_hub.infrastructure.exceptions.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
@@ -16,11 +17,11 @@ public class CNPJ {
 
     public CNPJ(String valor) {
         if (valor == null) {
-            throw new IllegalArgumentException("CNPJ não pode ser nulo!");
+            throw new BusinessException("CNPJ não pode ser nulo!");
         }
         String cleanValor = valor.replaceAll("[^0-9]", "");
         if (!isValid(cleanValor)) {
-            throw new IllegalArgumentException("CNPJ inválido!");
+            throw new BusinessException("CNPJ inválido!");
         }
         this.valor = cleanValor;
     }

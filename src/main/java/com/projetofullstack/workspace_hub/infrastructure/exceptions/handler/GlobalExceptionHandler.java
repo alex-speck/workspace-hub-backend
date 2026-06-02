@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 status.value(),
                 "Invalid argument",
-                e.getMessage(),
+                e.getLocalizedMessage(),
                 request.getRequestURI()
         );
         return ResponseEntity.status(status).body(err);

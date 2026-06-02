@@ -1,5 +1,6 @@
 package com.projetofullstack.workspace_hub.domain.valueobjects;
 
+import com.projetofullstack.workspace_hub.infrastructure.exceptions.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.NoArgsConstructor;
@@ -14,11 +15,11 @@ public class CPF {
 
     public CPF(String valor) {
         if (valor == null) {
-            throw new IllegalArgumentException("CPF não pode ser nulo!");
+            throw new BusinessException("CPF não pode ser nulo!");
         }
         String cleanValor = valor.replaceAll("[^0-9]", "");
         if (!isValid(cleanValor)) {
-            throw new IllegalArgumentException("CPF inválido!");
+            throw new BusinessException("CPF inválido!");
         }
         this.valor = cleanValor;
     }
