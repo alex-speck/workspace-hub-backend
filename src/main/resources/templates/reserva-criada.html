@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva Confirmada</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            background-color: #f8fafc;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #334155;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+
+        .header {
+            background: #10B981;
+            padding: 48px 32px;
+            text-align: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 40px 32px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #0f172a;
+        }
+
+        p {
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .reservation-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .reservation-item {
+            margin-bottom: 14px;
+        }
+
+        .reservation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin: 36px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background: #ce0808;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .info-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 10px;
+            padding: 16px;
+            color: #065f46;
+            margin-top: 24px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="email-container">
+
+    <div class="header">
+        <h1 class="logo">WorkSpace Hub</h1>
+        <div class="subtitle">
+            Reserva criada com sucesso
+        </div>
+    </div>
+
+    <div class="content">
+
+        <span class="badge">
+            ✓ Reserva Confirmada
+        </span>
+
+        <h2>Olá, {{nomeUsuario}}!</h2>
+
+        <p>
+            Sua reserva foi registrada com sucesso no WorkSpace Hub.
+            Guarde este e-mail, pois ele contém as informações necessárias para sua visita.
+        </p>
+
+        <div class="reservation-card">
+
+            <div class="reservation-item">
+                <span class="label">Empresa</span>
+                <span class="value">{{nomeEmpresa}}</span>
+            </div>
+
+            <div class="reservation-item">
+                <span class="label">Espaço</span>
+                <span class="value">{{nomeEspaco}}</span>
+            </div>
+
+            <div class="reservation-item">
+                <span class="label">Data</span>
+                <span class="value">{{dataReserva}}</span>
+            </div>
+
+            <div class="reservation-item">
+                <span class="label">Horário</span>
+                <span class="value">{{horaInicio}} às {{horaFim}}</span>
+            </div>
+
+            <div class="reservation-item">
+                <span class="label">Localização</span>
+                <span class="value">{{localizacao}}</span>
+            </div>
+
+            <div class="reservation-item">
+                <span class="label">Código da Reserva</span>
+                <span class="value">#{{codigoReserva}}</span>
+            </div>
+
+        </div>
+
+        <div class="button-wrapper">
+            <a href="{{linkCancelamento}}" class="button">
+                Cancelar Reserva
+            </a>
+        </div>
+
+        <p style="text-align:center; color:#64748b; font-size:14px;">
+            Caso não possa comparecer, recomendamos cancelar sua reserva com antecedência para disponibilizar o espaço a outros usuários.
+        </p>
+
+        <div class="info-box">
+            <strong>Importante para o acesso ao local</strong>
+            <br><br>
+
+            No dia da reserva, apresente um documento oficial com foto
+            (RG, CNH ou equivalente) na recepção ou portaria para validação
+            da sua identidade.
+
+            <br><br>
+
+            O não comparecimento com um documento de identificação poderá
+            impedir o acesso às dependências da empresa.
+        </div>
+
+        <p>
+            Agradecemos por utilizar o <strong>WorkSpace Hub</strong>.
+        </p>
+
+    </div>
+
+    <div class="footer">
+        © {{ano}} WorkSpace Hub. Todos os direitos reservados.<br>
+        Este é um e-mail automático, por favor não responda esta mensagem.
+    </div>
+
+</div>
+
+</body>
+</html>
+

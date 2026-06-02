@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao WorkSpace Hub</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            background-color: #f8fafc;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #334155;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+
+        .header {
+            background: #10B981;
+            padding: 48px 32px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 40px 32px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            color: #0f172a;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .company-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 28px 0;
+        }
+
+        .company-box strong {
+            color: #0f172a;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin: 36px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background: #10B981;
+            color: white !important;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="email-container">
+
+    <div class="header">
+        <h1 class="logo">WorkSpace Hub</h1>
+        <div class="subtitle">
+            Gestão inteligente para espaços de trabalho
+        </div>
+    </div>
+
+    <div class="content">
+
+        <span class="badge">
+            ✓ Cadastro concluído com sucesso
+        </span>
+
+        <h2>Bem-vindo ao WorkSpace Hub!</h2>
+
+        <p>
+            Olá,
+        </p>
+
+        <p>
+            O cadastro da sua empresa foi realizado com sucesso.
+            Sua organização agora faz parte da plataforma WorkSpace Hub e já pode
+            começar a utilizar nossos recursos para gerenciamento de ambientes,
+            reservas e colaboradores.
+        </p>
+
+        <div class="company-box">
+            <strong>Empresa:</strong> {{nomeEmpresa}}<br>
+            <strong>CNPJ:</strong> {{cnpj}}<br>
+            <strong>Data de cadastro:</strong> {{dataCadastro}}
+        </div>
+
+        <div class="button-wrapper">
+            <a href="{{linkAcesso}}" class="button">
+                Acessar Plataforma
+            </a>
+        </div>
+
+        <p>
+            Caso você não tenha realizado este cadastro, entre em contato com nossa equipe de suporte.
+        </p>
+
+        <p>
+            Agradecemos por escolher o WorkSpace Hub.
+        </p>
+
+        <p>
+            Atenciosamente,<br>
+            <strong>Equipe WorkSpace Hub</strong>
+        </p>
+
+    </div>
+
+    <div class="footer">
+        © {{ano}} WorkSpace Hub. Todos os direitos reservados.<br>
+        Este é um e-mail automático, por favor não responda esta mensagem.
+    </div>
+
+</div>
+
+</body>
+</html>
+

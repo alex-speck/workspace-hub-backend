@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "reservas")
@@ -21,6 +22,7 @@ public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String codigo;
 
     private LocalDate data;
     private LocalTime horaInicio;
@@ -47,7 +49,7 @@ public class Reserva {
         if(request.horaFim().isBefore(request.horaInicio())){
             throw new IllegalArgumentException("Hora final deve ser maior que a hora inicial");
         }
-
+        this.codigo = gerarCodigo(empresa.getRazaoSocial());
         this.data = request.data();
         this.horaInicio = request.horaInicio();
         this.horaFim = request.horaFim();
@@ -58,9 +60,22 @@ public class Reserva {
         this.calcularValorTotal();
     }
 
+
+
     public void calcularValorTotal() {
         double duracaoEmHoras = Duration.between(this.horaInicio, this.horaFim).toMinutes() / 60.0;
         this.valorTotal = duracaoEmHoras * this.valorHora;
+    }
+
+    private String gerarCodigo(String nomeEmpresa){
+        String prefixo = nomeEmpresa.substring(0, 3).toUpperCase();
+
+        String random = UUID.randomUUID()
+                .toString()
+                .substring(0, 4)
+                .toUpperCase();
+
+        return prefixo + "-" + random;
     }
 
 }

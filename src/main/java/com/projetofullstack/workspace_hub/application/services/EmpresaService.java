@@ -1,16 +1,23 @@
 package com.projetofullstack.workspace_hub.application.services;
 
+import com.projetofullstack.workspace_hub.application.dto.events.EnviarEmailEvent;
 import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpresaRequest;
 import com.projetofullstack.workspace_hub.domain.entities.Empresa;
 import com.projetofullstack.workspace_hub.domain.entities.Usuario;
+import com.projetofullstack.workspace_hub.domain.enums.EmailTypes;
 import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
 import com.projetofullstack.workspace_hub.domain.valueobjects.CNPJ;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmpresaService {
@@ -21,6 +28,10 @@ public class EmpresaService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Transactional
     public void cadastrarEmpresa(RegistroEmpresaRequest request){
 
         if(empresaRepository.existsEmpresaByCnpj(new CNPJ(request.cnpj()))){
@@ -41,6 +52,22 @@ public class EmpresaService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        //envia email de boas vindas
+        publicarEventoEmail(empresa);
+    }
+
+    private void publicarEventoEmail(Empresa empresa){
+        applicationEventPublisher.publishEvent(new EnviarEmailEvent(
+                empresa.getEmail(),
+                "Bem Vindos ao WorkSpace Hub!",
+                EmailTypes.CADASTRO,
+                Map.of(
+                        "nomeEmpresa", empresa.getRazaoSocial(),
+                        "cnpj", empresa.getCnpj().toFormattedString(),
+                        "dataCadastro", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                )
+        ));
     }
 
 
