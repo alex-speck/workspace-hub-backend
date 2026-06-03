@@ -151,7 +151,7 @@ public class UsuarioService {
                 return;
             }
 
-            var link = "http://localhost:3000/auth/alterar-senha/" + tokenService.gerarToken(email);
+            var link = "http://localhost:3000/alterar-senha/" + tokenService.gerarToken(email);
 
             applicationEventPublisher.publishEvent(new EnviarEmailEvent(
                     usuarioBanco.getEmail(),
