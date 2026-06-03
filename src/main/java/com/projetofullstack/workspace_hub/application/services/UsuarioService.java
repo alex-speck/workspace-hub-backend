@@ -160,7 +160,7 @@ public class UsuarioService {
                     Map.of(
                             "nomeUsuario", usuarioBanco.getNome(),
                             "linkRecuperacao", link,
-                            "tempoExpiracao", "15 minutos"
+                            "tempoExpiracao", "1 hora"
                     )
             ));
 
