@@ -1,7 +1,13 @@
 package com.projetofullstack.workspace_hub.application.services;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.projetofullstack.workspace_hub.application.dto.events.EnviarEmailEvent;
 import com.projetofullstack.workspace_hub.application.dto.request.*;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogado;
+import com.projetofullstack.workspace_hub.domain.enums.EmailTypes;
+import com.projetofullstack.workspace_hub.domain.enums.StatusUsuario;
 import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogadoResponse;
@@ -11,11 +17,14 @@ import com.projetofullstack.workspace_hub.domain.repository.UsuarioRepository;
 import com.projetofullstack.workspace_hub.infrastructure.providers.UsuarioLogadoProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UsuarioService {
@@ -31,6 +40,12 @@ public class UsuarioService {
 
     @Autowired
     private EmpresaRepository empresaRepository;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public boolean validarUsuarioSenha(LoginRequest request) {
         try {
@@ -125,4 +140,57 @@ public class UsuarioService {
         usuario.setSenha(encoder.encode(usuario.getSenha()));
         return new UsuarioResponse(repository.save(usuario));
     }
+
+    public void criarAlterarSenha(String email) {
+        var usuario = repository.findByEmail(email);
+
+        if (usuario.isPresent()) {
+            var usuarioBanco = usuario.get();
+
+            if (usuarioBanco.getStatus() != StatusUsuario.ATIVO) {
+                return;
+            }
+
+            var link = "http://localhost:3000/auth/alterar-senha/" + tokenService.gerarToken(email);
+
+            applicationEventPublisher.publishEvent(new EnviarEmailEvent(
+                    usuarioBanco.getEmail(),
+                    "WorkSpaceHub | Alterar Senha de Acesso",
+                    EmailTypes.RECUPERACAO_SENHA,
+                    Map.of(
+                            "nomeUsuario", usuarioBanco.getNome(),
+                            "linkRecuperacao", link,
+                            "tempoExpiracao", "15 minutos"
+                    )
+            ));
+
+        }
+
+    }
+
+    public boolean recuperarSenha(UsuarioRecuperarSenha request) {
+
+        if (!request.senha().equals(request.confirmacaoSenha())) {
+            throw new IllegalArgumentException("As senhas não coincidem!");
+        }
+
+        try {
+            var usuario = tokenService.validarToken(request.token());
+
+            if(usuario == null) {
+                return false;
+            }
+
+            usuario.setSenha(encoder.encode(request.senha()));
+            repository.save(usuario);
+
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Token invalido ou expirado!");
+        }
+
+    }
+
+
+
 }

@@ -73,7 +73,7 @@ public class ReservaService {
                         "dataReserva", reserva.getData(),
                         "horaInicio", reserva.getHoraInicio(),
                         "horaFim", reserva.getHoraFim(),
-                        "localizacao", espaco.getNomeNumero(),
+                        "localizacao", espaco.getEndereco(),
                         "codigoReserva", reserva.getCodigo()
                 )
         ));
@@ -104,7 +104,7 @@ public class ReservaService {
                         "dataReserva", reserva.getData(),
                         "horaInicio", reserva.getHoraInicio(),
                         "horaFim", reserva.getHoraFim(),
-                        "localizacao", reserva.getEspaco().getNomeNumero(),
+                        "localizacao", reserva.getEspaco().getEndereco(),
                         "codigoReserva", reserva.getCodigo(),
                         "dataCancelamento", LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 )
@@ -134,7 +134,7 @@ public class ReservaService {
                         "dataReserva", reserva.getData(),
                         "horaInicio", reserva.getHoraInicio(),
                         "horaFim", reserva.getHoraFim(),
-                        "localizacao", reserva.getEspaco().getNomeNumero(),
+                        "localizacao", reserva.getEspaco().getEndereco(),
                         "codigoReserva", reserva.getCodigo()
                 )
         ));

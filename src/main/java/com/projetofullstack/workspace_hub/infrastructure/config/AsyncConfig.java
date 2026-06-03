@@ -13,6 +13,8 @@ public class AsyncConfig implements AsyncConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(AsyncConfig.class);
 
+
+    // Isso foi util quando o erro não tava aparecendo porem não serve mais, vou deixar aqui so por desencargo ;D
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (ex, method, params) -> {

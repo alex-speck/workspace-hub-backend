@@ -3,6 +3,7 @@ package com.projetofullstack.workspace_hub.domain.entities;
 import com.projetofullstack.workspace_hub.application.dto.request.EspacoRequest;
 import com.projetofullstack.workspace_hub.domain.enums.StatusEspaco;
 import com.projetofullstack.workspace_hub.domain.enums.TipoEspaco;
+import com.projetofullstack.workspace_hub.domain.valueobjects.Endereco;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +28,9 @@ public class Espaco {
     private Double valorHora;
     @Enumerated(EnumType.STRING)
     private StatusEspaco status = StatusEspaco.DISPONIVEL;
+
+    @Embedded
+    private Endereco endereco;
 
     @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reserva> reservas;
