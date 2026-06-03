@@ -2,14 +2,26 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.projetofullstack.workspacehub.desktop.controllers.LoginController" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.projetofullstack.workspacehub.desktop.controllers.LoginController">
+    <stylesheets>
+        <URL value="@style.css" />
+    </stylesheets>
     <children>
-        <Label layoutX="227.0" layoutY="125.0" text="Usuario" />
-        <TextField fx:id="txtUsuario" layoutX="226.0" layoutY="142.0" />
-        <Label layoutX="227.0" layoutY="176.0" text="Senha" />
-        <PasswordField fx:id="txtSenha" layoutX="226.0" layoutY="193.0" />
-        <Button layoutX="225.0" layoutY="231.0" mnemonicParsing="false" onAction="#onLoginButtonClick" prefHeight="25.0" prefWidth="149.0" text="Entrar" />
+        <VBox alignment="CENTER" spacing="20" maxWidth="350" maxHeight="300" styleClass="card">
+            <children>
+                <Label text="Workspace Hub" styleClass="title-label" />
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Usuário" />
+                    <TextField fx:id="txtUsuario" promptText="Digite seu usuário" />
+                </VBox>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Senha" />
+                    <PasswordField fx:id="txtSenha" promptText="Digite sua senha" />
+                </VBox>
+                <Button onAction="#onLoginButtonClick" prefWidth="Infinity" text="Entrar" />
+            </children>
+        </VBox>
     </children>
-</AnchorPane>
+</StackPane>

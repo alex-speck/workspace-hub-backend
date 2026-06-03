@@ -2,10 +2,19 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.projetofullstack.workspacehub.desktop.controllers.MenuController">
-   <children>
-      <Button onAction="#onVoltarButtonClick" layoutX="524.0" layoutY="14.0" mnemonicParsing="false" text="Logout" />
-      <Button onAction="#onCadastroUsuarioButtonClick" layoutX="239.0" layoutY="129.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="122.0" text="Cadastrar Usuario" />
-   </children>
-</AnchorPane>
+<StackPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.projetofullstack.workspacehub.desktop.controllers.MenuController">
+    <stylesheets>
+        <URL value="@style.css" />
+    </stylesheets>
+    <children>
+        <VBox alignment="CENTER" spacing="30" maxWidth="400" maxHeight="300" styleClass="card">
+            <children>
+                <Label text="Menu Principal" styleClass="title-label" />
+                <Button onAction="#onCadastroUsuarioButtonClick" prefHeight="45.0" prefWidth="250.0" text="Cadastrar Usuário Admin" />
+                <Button onAction="#onVoltarButtonClick" prefWidth="250.0" text="Logout" styleClass="button-secondary" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>

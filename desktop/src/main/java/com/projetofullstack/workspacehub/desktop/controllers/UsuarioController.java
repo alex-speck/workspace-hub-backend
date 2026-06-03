@@ -31,17 +31,11 @@ public class UsuarioController {
     private TextField txtSenha;
     @FXML
     private TextField txtConfirmarSenha;
-    @FXML
-    private TextField txtCep;
-    @FXML
-    private TextArea txtEndereco;
 
     @FXML
     private void onCriarButtonClicked(ActionEvent event) throws IOException {
         if (!txtSenha.getText().equals(txtConfirmarSenha.getText())){
             showMessage("Erro", "As senhas não conhecidem", Alert.AlertType.ERROR);
-        } else if (txtEndereco.getText().isEmpty()){
-            showMessage("Erro", "Deve conter um endereço!", Alert.AlertType.ERROR);
         } else {
             URL url = new URL("http://localhost:8080/usuarios/admin");
 
@@ -56,7 +50,6 @@ public class UsuarioController {
                     "  \"email\": \""+ txtEmail.getText() +"\",\n" +
                     "  \"senha\": \""+ txtSenha.getText() +"\"\n" +
                     "  \"secretKey\": \"oyuq87y2e987y2e49yahwduhi721yeolid\" \n" +
-                    "  \"endereco\": " + txtEndereco.getText() + " \n" +
                     "}";
 
             try(OutputStream os = conn.getOutputStream()){
@@ -92,33 +85,6 @@ public class UsuarioController {
         stage.setScene(scene);
     }
 
-    @FXML
-    private void onBuscarEnderecoButtonClick() throws Exception {
-        URL url = new URL("https://viacep.com.br/ws/" + txtCep.getText() + "/json/");
-
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setDoOutput(true);
-
-        var code = conn.getResponseCode();
-
-        if (code >= 200 && code < 300) {
-            StringBuilder response = new StringBuilder();
-
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line).append("\n");
-                }
-            }
-
-            txtEndereco.setText(response.toString());
-            System.out.println(response);
-        }
-
-        conn.disconnect();
-
-    }
 
     private void showMessage(String titulo, String message, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
