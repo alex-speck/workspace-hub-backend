@@ -36,7 +36,7 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/reservas/cancelar").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/reservas/cancelar/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/reservas/detalhes-cancelamento/**").permitAll()
                         .requestMatchers("/usuarios").hasAnyRole("ADMIN", "GESTOR")
                         .anyRequest().authenticated()
