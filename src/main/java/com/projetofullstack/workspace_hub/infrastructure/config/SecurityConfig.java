@@ -29,15 +29,16 @@ public class SecurityConfig {
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/login",
-                                "/auth/cadastro",
+                                "/auth/**",
                                 "/usuarios/admin",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/usuarios").hasAnyRole("ADMIN", "GESTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/reservas/cancelar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/reservas/detalhes-cancelamento/**").permitAll()
+                        .requestMatchers("/usuarios").hasAnyRole("ADMIN", "GESTOR")
                         .anyRequest().authenticated()
                 )
                 .build();

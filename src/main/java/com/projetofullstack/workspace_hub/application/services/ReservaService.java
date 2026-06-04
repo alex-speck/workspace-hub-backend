@@ -1,8 +1,12 @@
 package com.projetofullstack.workspace_hub.application.services;
 
 import com.projetofullstack.workspace_hub.application.dto.events.EnviarEmailEvent;
+import com.projetofullstack.workspace_hub.application.dto.response.CancelamentoReservaResumo;
 import com.projetofullstack.workspace_hub.application.dto.response.ReservaResumoResponse;
+import com.projetofullstack.workspace_hub.domain.entities.HistoricoReserva;
+import com.projetofullstack.workspace_hub.domain.entities.TokenCancelamentoReserva;
 import com.projetofullstack.workspace_hub.domain.enums.EmailTypes;
+import com.projetofullstack.workspace_hub.domain.repository.*;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.BusinessException;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.application.dto.request.ReservaRequest;
@@ -12,10 +16,6 @@ import com.projetofullstack.workspace_hub.domain.entities.Reserva;
 import com.projetofullstack.workspace_hub.domain.enums.StatusCliente;
 import com.projetofullstack.workspace_hub.domain.enums.StatusEspaco;
 import com.projetofullstack.workspace_hub.domain.enums.StatusReserva;
-import com.projetofullstack.workspace_hub.domain.repository.ClienteRepository;
-import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
-import com.projetofullstack.workspace_hub.domain.repository.EspacoRepository;
-import com.projetofullstack.workspace_hub.domain.repository.ReservaRepository;
 import com.projetofullstack.workspace_hub.infrastructure.providers.UsuarioLogadoProvider;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +25,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +36,10 @@ public class ReservaService {
 
     @Autowired
     private ReservaRepository reservaRepository;
+    @Autowired
+    private HistoricoReservaRepository historicoReservaRepository;
+    @Autowired
+    private TokenCancelamentoReservaRepository tokenCancelamentoReservaRepository;
     @Autowired
     private ClienteRepository clienteRepository;
     @Autowired
@@ -61,6 +67,12 @@ public class ReservaService {
 
         Reserva reserva = new Reserva(request, cliente, espaco, empresa);
         reservaRepository.save(reserva);
+        historicoReservaRepository.save(new HistoricoReserva(reserva, null, StatusReserva.ABERTA, false));
+
+        LocalDateTime dataReserva = reserva.getData().atTime(reserva.getHoraInicio());
+        LocalDateTime dataExpiracao = dataReserva.minusDays(1);
+
+        var token = tokenCancelamentoReservaRepository.save(new TokenCancelamentoReserva(reserva, gerarCodigoCancelamento(), dataExpiracao));
 
         applicationEventPublisher.publishEvent(new EnviarEmailEvent(
                 cliente.getEmail(),
@@ -74,7 +86,8 @@ public class ReservaService {
                         "horaInicio", reserva.getHoraInicio(),
                         "horaFim", reserva.getHoraFim(),
                         "localizacao", espaco.getEndereco(),
-                        "codigoReserva", reserva.getCodigo()
+                        "codigoReserva", reserva.getCodigo(),
+                        "linkCancelamento", "http://localhost:3000/cancelar-reserva/" + token.getToken()
                 )
         ));
 
@@ -90,8 +103,11 @@ public class ReservaService {
             return;
         }
 
+        historicoReservaRepository.save(new HistoricoReserva(reserva, reserva.getStatus(), StatusReserva.CANCELADA, false));
+
         reserva.setStatus(StatusReserva.CANCELADA);
         reservaRepository.save(reserva);
+
 
         applicationEventPublisher.publishEvent(new EnviarEmailEvent(
                 reserva.getCliente().getEmail(),
@@ -106,9 +122,29 @@ public class ReservaService {
                         "horaFim", reserva.getHoraFim(),
                         "localizacao", reserva.getEspaco().getEndereco(),
                         "codigoReserva", reserva.getCodigo(),
-                        "dataCancelamento", LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                        "dataCancelamento", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 )
         ));
+    }
+
+    @Transactional
+    public CancelamentoReservaResumo buscarDetalhesReservaCancelamento(String token) {
+        var tokenRecover = tokenCancelamentoReservaRepository
+                .findByTokenAndDataExpiracaoAfterAndUtilizadoFalse(token, LocalDateTime.now())
+                .orElseThrow(() -> new BusinessException("Token informado é invalido"));
+
+        var reserva = tokenRecover.getReserva();
+
+        return new CancelamentoReservaResumo(
+                reserva.getEmpresa().getRazaoSocial(),
+                reserva.getCliente().getNome(),
+                reserva.getData(),
+                reserva.getHoraInicio(),
+                reserva.getHoraFim(),
+                reserva.getCodigo(),
+                reserva.getEspaco().getEndereco().toString(),
+                reserva.getEspaco().getNomeNumero()
+        );
     }
 
     @Transactional
@@ -119,6 +155,8 @@ public class ReservaService {
         if (reserva.getStatus() != StatusReserva.ABERTA) {
             return;
         }
+
+        historicoReservaRepository.save(new HistoricoReserva(reserva, reserva.getStatus(), StatusReserva.CANCELADA, false));
 
         reserva.setStatus(StatusReserva.CONCLUIDA);
         reservaRepository.save(reserva);
@@ -177,6 +215,42 @@ public class ReservaService {
                 reservas.stream().filter(r -> r.data().isEqual(hoje)).toList(),
                 reservas.stream().filter(r -> r.data().isAfter(hoje)).toList()
         );
+    }
+
+    @Transactional
+    public void clienteCancelarReserva(String token){
+        var tokenRecover = tokenCancelamentoReservaRepository
+                .findByTokenAndDataExpiracaoAfterAndUtilizadoFalse(token, LocalDateTime.now())
+                .orElseThrow(() -> new BusinessException("Token informado é invalido"));
+
+        tokenRecover.setUtilizado(true);
+        var reserva = tokenRecover.getReserva();
+        historicoReservaRepository.save(new HistoricoReserva(reserva, reserva.getStatus(), StatusReserva.CANCELADA, true));
+        reserva.setStatus(StatusReserva.CANCELADA);
+        reservaRepository.save(reserva);
+        tokenCancelamentoReservaRepository.save(tokenRecover);
+
+
+        applicationEventPublisher.publishEvent(new EnviarEmailEvent(
+                reserva.getCliente().getEmail(),
+                "Sua Reserva #" + reserva.getCodigo() + " foi cancelada",
+                EmailTypes.RESERVA_CANCELADA,
+                Map.of(
+                        "nomeUsuario", reserva.getCliente().getNome(),
+                        "nomeEmpresa", reserva.getEmpresa().getRazaoSocial(),
+                        "nomeEspaco", reserva.getEspaco().getNomeNumero(),
+                        "dataReserva", reserva.getData(),
+                        "horaInicio", reserva.getHoraInicio(),
+                        "horaFim", reserva.getHoraFim(),
+                        "localizacao", reserva.getEspaco().getEndereco(),
+                        "codigoReserva", reserva.getCodigo(),
+                        "dataCancelamento", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                )
+        ));
+    }
+
+    private String gerarCodigoCancelamento(){
+        return UUID.randomUUID().toString();
     }
 
     private boolean reservaExiste(LocalDate data, LocalTime horaInicio, LocalTime horaFim, Long espacoId, Long empresaId) {

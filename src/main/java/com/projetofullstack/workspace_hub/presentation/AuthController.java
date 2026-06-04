@@ -2,6 +2,7 @@ package com.projetofullstack.workspace_hub.presentation;
 
 import com.projetofullstack.workspace_hub.application.dto.request.LoginRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpresaRequest;
+import com.projetofullstack.workspace_hub.application.dto.request.UsuarioAlterarSenhaSolicitacao;
 import com.projetofullstack.workspace_hub.application.dto.request.UsuarioRecuperarSenha;
 import com.projetofullstack.workspace_hub.application.dto.response.LoginResponse;
 import com.projetofullstack.workspace_hub.application.services.EmpresaService;
@@ -50,8 +51,8 @@ public class AuthController {
 
     @PostMapping("/recuperar-senha")
     @Operation(summary = "Pedido de recuperação de senha", description = "Recebe um email, se existir um usuario com esse email envia um link por email para recuperar a senha")
-    public ResponseEntity<?> recuperarSenha(@RequestBody String email){
-        usuarioService.criarAlterarSenha(email);
+    public ResponseEntity<?> recuperarSenha(@RequestBody UsuarioAlterarSenhaSolicitacao request){
+        usuarioService.criarAlterarSenha(request.email());
 
         return ResponseEntity.ok().build();
     }

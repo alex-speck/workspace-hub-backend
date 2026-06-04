@@ -38,15 +38,15 @@ public class EmpresaService {
     @Transactional
     public void cadastrarEmpresa(RegistroEmpresaRequest request){
 
-        if (!verificarCNPJ(request.cnpj())){
-            throw new IllegalArgumentException("Não existe empresa com esse CNPJ");
-        }
-
         if(empresaRepository.existsEmpresaByCnpj(new CNPJ(request.cnpj()))){
             throw new IllegalArgumentException("CNPJ já cadastrado");
         }
 
         Empresa empresa = new Empresa(request);
+
+        if (!verificarCNPJ(empresa.getCnpj().getValor())){
+            throw new IllegalArgumentException("Não existe empresa com esse CNPJ");
+        }
 
         Usuario usuarioPadrao = new Usuario(request.usuarioPadrao(), empresa);
         usuarioPadrao.setRole("GESTOR");
@@ -73,7 +73,8 @@ public class EmpresaService {
                 Map.of(
                         "nomeEmpresa", empresa.getRazaoSocial(),
                         "cnpj", empresa.getCnpj().toFormattedString(),
-                        "dataCadastro", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        "dataCadastro", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        "linkAcesso", "http://localhost:3000/login"
                 )
         ));
     }

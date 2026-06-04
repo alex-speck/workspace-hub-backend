@@ -6,9 +6,12 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.projetofullstack.workspace_hub.application.dto.events.EnviarEmailEvent;
 import com.projetofullstack.workspace_hub.application.dto.request.*;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogado;
+import com.projetofullstack.workspace_hub.domain.entities.TokenAlterarSenhaUsuario;
 import com.projetofullstack.workspace_hub.domain.enums.EmailTypes;
 import com.projetofullstack.workspace_hub.domain.enums.StatusUsuario;
 import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
+import com.projetofullstack.workspace_hub.domain.repository.TokenAlterarSenhaUsuarioRepository;
+import com.projetofullstack.workspace_hub.infrastructure.exceptions.BusinessException;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioLogadoResponse;
 import com.projetofullstack.workspace_hub.application.dto.response.UsuarioResponse;
@@ -23,8 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -42,7 +47,7 @@ public class UsuarioService {
     private EmpresaRepository empresaRepository;
 
     @Autowired
-    private TokenService tokenService;
+    private TokenAlterarSenhaUsuarioRepository tokenRepository;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -132,7 +137,7 @@ public class UsuarioService {
 
     public UsuarioResponse salvarUsuarioAdmin(CriarUsuarioAdminRequest request) {
 
-        if (!request.secretKey().equals(secret)){
+        if (!request.secretKey().equals(secret)) {
             return new UsuarioResponse(0L, "", "", null);
         }
 
@@ -151,7 +156,7 @@ public class UsuarioService {
                 return;
             }
 
-            var link = "http://localhost:3000/alterar-senha/" + tokenService.gerarToken(email);
+            var link = "http://localhost:3000/alterar-senha/" + gerarToken(usuarioBanco);
 
             applicationEventPublisher.publishEvent(new EnviarEmailEvent(
                     usuarioBanco.getEmail(),
@@ -174,23 +179,24 @@ public class UsuarioService {
             throw new IllegalArgumentException("As senhas não coincidem!");
         }
 
-        try {
-            var usuario = tokenService.validarToken(request.token());
+        var tokenRecover = tokenRepository
+                .findByTokenAndDataExpiracaoAfterAndUtilizadoFalse(request.token(), LocalDateTime.now())
+                .orElseThrow(() -> new BusinessException("Token invalido ou expirado!"));
 
-            if(usuario == null) {
-                return false;
-            }
+        var usuario = tokenRecover.getUsuario();
 
-            usuario.setSenha(encoder.encode(request.senha()));
-            repository.save(usuario);
+        usuario.setSenha(encoder.encode(request.senha()));
+        repository.save(usuario);
 
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException("Token invalido ou expirado!");
-        }
+        return true;
 
     }
 
+    private String gerarToken(Usuario usuario) {
+        var token = UUID.randomUUID().toString();
+        tokenRepository.save(new TokenAlterarSenhaUsuario(usuario, token));
+        return token;
+    }
 
 
 }

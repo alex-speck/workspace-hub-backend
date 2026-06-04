@@ -5,6 +5,7 @@ import com.projetofullstack.workspace_hub.application.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -22,6 +23,7 @@ public class EmailEventListener {
     @TransactionalEventListener(
             phase = TransactionPhase.AFTER_COMMIT
     )
+    @EventListener
     public void onEmailEvent(EnviarEmailEvent event){
         log.info("Recebido evento de email para: {}", event.to());
         try {

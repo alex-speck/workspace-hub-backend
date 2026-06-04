@@ -1,7 +1,7 @@
 package com.projetofullstack.workspace_hub.presentation;
 
 import com.projetofullstack.workspace_hub.application.dto.request.ReservaRequest;
-import com.projetofullstack.workspace_hub.application.dto.response.ReservaResponse;
+import com.projetofullstack.workspace_hub.application.dto.response.CancelamentoReservaResumo;
 import com.projetofullstack.workspace_hub.application.dto.response.ReservaResumoResponse;
 import com.projetofullstack.workspace_hub.application.services.ReservaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,8 +10,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/reservas")
@@ -48,8 +46,21 @@ public class ReservaController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Cancelar reserva", description = "Cancela a reserva com o id especificado")
-    public ResponseEntity<?> excluirReserva(@PathVariable Long id){
+    public ResponseEntity<?> cancelarReserva(@PathVariable Long id){
         reservaService.cancelarReserva(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/detalhes-cancelamento/{token}")
+    @Operation(summary = "Retorna detalhes da reserva", description = "Retorna alguns detalhes da reserva para o cliente confirmar os dados")
+    public ResponseEntity<CancelamentoReservaResumo> buscarResumoCancelamento(@PathVariable String token){
+        return ResponseEntity.ok(reservaService.buscarDetalhesReservaCancelamento(token));
+    }
+
+    @DeleteMapping("/cancelar/{token}")
+    @Operation(summary = "Cliente cancelar reserva", description = "Cliente cancela a reserva a partir de um token gerado na criação da reserva")
+    public ResponseEntity<?> clienteCancelarReserva(@PathVariable String token){
+        reservaService.clienteCancelarReserva(token);
         return ResponseEntity.noContent().build();
     }
 
