@@ -11,6 +11,6 @@ public record EspacoRequest(
         TipoEspaco tipo,
         @Positive(message = "O valor deve ser positivo ou zero")
         Double valorHora,
-        Endereco endereco
+        EnderecoRequest endereco
 ) {
 }

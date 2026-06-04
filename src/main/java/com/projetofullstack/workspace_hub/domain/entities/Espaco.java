@@ -43,6 +43,7 @@ public class Espaco {
         this.nomeNumero = request.nomeNumero();
         this.tipo = request.tipo();
         this.valorHora = request.valorHora();
+        this.endereco = new Endereco(request.endereco());
         this.empresa = empresa;
     }
 

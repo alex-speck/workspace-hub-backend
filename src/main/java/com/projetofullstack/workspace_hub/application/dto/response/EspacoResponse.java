@@ -11,9 +11,9 @@ public record EspacoResponse(
         TipoEspaco tipo,
         Double valorHora,
         StatusEspaco status,
-        Endereco endereco
+        EnderecoResponse endereco
 ) {
     public EspacoResponse(Espaco espaco) {
-        this(espaco.getId(), espaco.getNomeNumero(), espaco.getTipo(), espaco.getValorHora(), espaco.getStatus(), espaco.getEndereco());
+        this(espaco.getId(), espaco.getNomeNumero(), espaco.getTipo(), espaco.getValorHora(), espaco.getStatus(), new EnderecoResponse(espaco.getEndereco()));
     }
 }
