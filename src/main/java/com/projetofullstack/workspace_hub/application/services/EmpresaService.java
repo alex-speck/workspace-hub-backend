@@ -13,6 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -33,6 +37,10 @@ public class EmpresaService {
 
     @Transactional
     public void cadastrarEmpresa(RegistroEmpresaRequest request){
+
+        if (!verificarCNPJ(request.cnpj())){
+            throw new IllegalArgumentException("Não existe empresa com esse CNPJ");
+        }
 
         if(empresaRepository.existsEmpresaByCnpj(new CNPJ(request.cnpj()))){
             throw new IllegalArgumentException("CNPJ já cadastrado");
@@ -68,6 +76,27 @@ public class EmpresaService {
                         "dataCadastro", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 )
         ));
+    }
+
+    private boolean verificarCNPJ(String cnpj) {
+        try {
+            URL url = new URL("https://brasilapi.com.br/api/cnpj/v1/" + cnpj);
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(3000);
+
+
+            var code = conn.getResponseCode();
+            conn.disconnect();
+
+            return code == 200;
+        } catch (IOException e) {
+            return false;
+        }
+
     }
 
 
