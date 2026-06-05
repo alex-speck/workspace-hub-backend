@@ -43,7 +43,7 @@ public class Usuario implements UserDetails {
         this.nome = request.nome();
         this.email = request.email();
         this.senha = request.senha();
-        this.role = "USER";
+        this.role = "RECEPCIONISTA";
         this.empresa = empresa;
     }
 
