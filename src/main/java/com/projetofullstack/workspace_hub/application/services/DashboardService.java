@@ -12,15 +12,13 @@ import com.projetofullstack.workspace_hub.infrastructure.providers.UsuarioLogado
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,49 +27,33 @@ public class DashboardService {
     @Autowired
     private ReservaRepository reservaRepository;
 
-    @Autowired
-    private EspacoRepository espacoRepository;
-
-    @Autowired
-    private EmailRepository emailRepository;
-
     public DashboardDataResponse getDashboardData() {
-        UsuarioLogado usuario = UsuarioLogadoProvider.getUsuarioLogado();
-        if (usuario == null) {
-            throw new RuntimeException("Usuário não autenticado");
+        Long empresaId = UsuarioLogadoProvider.getUsuarioLogado().empresaId();
+        if (empresaId == null) {
+            return null;
         }
-        Long empresaId = usuario.empresaId();
-
-        List<Reserva> todasReservas = reservaRepository.findAllByEmpresaId(empresaId);
-        List<Espaco> todosEspacos = espacoRepository.findAllByEmpresaId(empresaId); // Should probably filter by company if possible, but Email doesn't have companyId
-
         LocalDate hoje = LocalDate.now();
 
-        // 1. Stats
-        List<DashboardStatsResponse> stats = calculateStats(todasReservas);
+        List<Reserva> todasReservas = reservaRepository.findAllByEmpresaId(empresaId);
 
-        // 2. Faturamento
-        FaturamentoResumoResponse faturamento = calculateFaturamento(todasReservas);
-
-        // 3. Reservas Hoje e Próximas
         List<ReservaResponse> reservasHoje = todasReservas.stream()
-                .filter(r -> r.getData().isEqual(hoje))
+                .filter(r -> r.getData().isEqual(hoje) && r.getStatus() != StatusReserva.CANCELADA)
                 .map(ReservaResponse::new)
                 .collect(Collectors.toList());
 
         List<ReservaResponse> proximasReservas = todasReservas.stream()
-                .filter(r -> r.getData().isAfter(hoje))
+                .filter(r -> r.getData().isAfter(hoje) && r.getStatus() != StatusReserva.CANCELADA)
                 .sorted(Comparator.comparing(Reserva::getData).thenComparing(Reserva::getHoraInicio))
                 .limit(5)
                 .map(ReservaResponse::new)
                 .collect(Collectors.toList());
 
-        // 4. Ocupação Salas
-        List<OcupacaoSalaResponse> ocupacaoSalas = calculateOcupacao(todosEspacos, todasReservas, hoje);
-
-
-
-        return new DashboardDataResponse(stats, faturamento, reservasHoje, proximasReservas, ocupacaoSalas, null);
+        return new DashboardDataResponse(
+                calculateStats(todasReservas),
+                calculateFaturamento(todasReservas),
+                reservasHoje,
+                proximasReservas
+        );
     }
 
     private List<DashboardStatsResponse> calculateStats(List<Reserva> reservas) {
@@ -80,55 +62,72 @@ public class DashboardService {
                 .mapToDouble(Reserva::getValorTotal)
                 .sum();
 
-        long totalReservas = reservas.size();
-        long clientesAtivos = reservas.stream().map(r -> r.getCliente().getId()).distinct().count();
-        
-        // Simple growth placeholder or comparison logic
+        long totalReservas = reservas.stream()
+                .filter(r -> r.getStatus() != StatusReserva.CANCELADA)
+                .count();
+
+        long clientesAtivos = reservas.stream()
+                .filter(r -> r.getStatus() != StatusReserva.CANCELADA)
+                .map(r -> r.getCliente().getId())
+                .distinct()
+                .count();
+
         return List.of(
-            new DashboardStatsResponse("Receita Total", "R$ " + String.format("%.2f", receitaTotal), "+12.5%", "up", "DollarSign"),
-            new DashboardStatsResponse("Reservas", totalReservas, "+5.2%", "up", "Calendar"),
-            new DashboardStatsResponse("Clientes Ativos", clientesAtivos, "+3.1%", "up", "Users"),
-            new DashboardStatsResponse("Taxa de Ocupação", "65%", "-2.4%", "down", "BarChart")
+                new DashboardStatsResponse("Receita Total", "R$ " + String.format("%.2f", receitaTotal)),
+                new DashboardStatsResponse("Reservas", totalReservas),
+                new DashboardStatsResponse("Clientes Ativos", clientesAtivos)
         );
     }
 
     private FaturamentoResumoResponse calculateFaturamento(List<Reserva> reservas) {
         LocalDate hoje = LocalDate.now();
-        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd/MM");
-        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMM");
+        Locale ptBR = new Locale("pt", "BR");
+        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd/MM", ptBR);
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMM", ptBR);
 
-        // Diário (Last 7 days)
+        // Diário: últimos 7 dias
         List<FaturamentoDadosResponse> diario = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
             LocalDate date = hoje.minusDays(i);
             double total = reservas.stream()
                     .filter(r -> r.getData().isEqual(date) && r.getStatus() != StatusReserva.CANCELADA)
-                    .mapToDouble(Reserva::getValorTotal).sum();
+                    .mapToDouble(Reserva::getValorTotal)
+                    .sum();
             diario.add(new FaturamentoDadosResponse(date.format(dayFormatter), total));
         }
 
-        // Mensal (Last 6 months)
+        // Semanal: últimas 6 semanas
+        List<FaturamentoDadosResponse> semanal = new ArrayList<>();
+        for (int i = 5; i >= 0; i--) {
+            LocalDate inicioSemana = hoje.minusWeeks(i).with(DayOfWeek.MONDAY);
+            LocalDate fimSemana = inicioSemana.plusDays(6);
+            double total = reservas.stream()
+                    .filter(r -> {
+                        LocalDate data = r.getData();
+                        return !data.isBefore(inicioSemana)
+                                && !data.isAfter(fimSemana)
+                                && r.getStatus() != StatusReserva.CANCELADA;
+                    })
+                    .mapToDouble(Reserva::getValorTotal)
+                    .sum();
+            String label = inicioSemana.format(dayFormatter) + " - " + fimSemana.format(dayFormatter);
+            semanal.add(new FaturamentoDadosResponse(label, total));
+        }
+
+        // Mensal: últimos 6 meses
         List<FaturamentoDadosResponse> mensal = new ArrayList<>();
         for (int i = 5; i >= 0; i--) {
             LocalDate date = hoje.minusMonths(i);
             double total = reservas.stream()
-                    .filter(r -> r.getData().getMonth() == date.getMonth() && r.getData().getYear() == date.getYear() && r.getStatus() != StatusReserva.CANCELADA)
-                    .mapToDouble(Reserva::getValorTotal).sum();
+                    .filter(r -> r.getData().getMonth() == date.getMonth()
+                            && r.getData().getYear() == date.getYear()
+                            && r.getStatus() != StatusReserva.CANCELADA)
+                    .mapToDouble(Reserva::getValorTotal)
+                    .sum();
             mensal.add(new FaturamentoDadosResponse(date.format(monthFormatter), total));
         }
 
-        return new FaturamentoResumoResponse(diario, diario, mensal); // Weekly simplified as daily for now
-    }
-
-    private List<OcupacaoSalaResponse> calculateOcupacao(List<Espaco> espacos, List<Reserva> reservas, LocalDate date) {
-        return espacos.stream().map(espaco -> {
-            double horasOcupadas = reservas.stream()
-                    .filter(r -> r.getEspaco().getId().equals(espaco.getId()) && r.getData().isEqual(date) && r.getStatus() != StatusReserva.CANCELADA)
-                    .mapToDouble(r -> Duration.between(r.getHoraInicio(), r.getHoraFim()).toMinutes() / 60.0)
-                    .sum();
-            double percentual = (horasOcupadas / 12.0) * 100.0; // Assuming 12h workday
-            return new OcupacaoSalaResponse(espaco.getId(), espaco.getNomeNumero(), Math.min(percentual, 100.0));
-        }).collect(Collectors.toList());
+        return new FaturamentoResumoResponse(diario, semanal, mensal);
     }
 
 }

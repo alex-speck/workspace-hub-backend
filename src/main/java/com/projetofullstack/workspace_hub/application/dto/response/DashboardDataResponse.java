@@ -6,7 +6,5 @@ public record DashboardDataResponse(
     List<DashboardStatsResponse> stats,
     FaturamentoResumoResponse faturamento,
     List<ReservaResponse> reservasHoje,
-    List<ReservaResponse> proximasReservas,
-    List<OcupacaoSalaResponse> ocupacaoSalas,
-    List<NotificacaoResponse> notificacoes
+    List<ReservaResponse> proximasReservas
 ) {}
