@@ -50,4 +50,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/aulafull20252:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/workspacehubapi:latest
