@@ -12,7 +12,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
         registry
                 .addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("http://localhost:3000", "https://workspace-hub-frontend.onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "OPTIONS", "HEAD", "DELETE", "PATCH");
 
     }
