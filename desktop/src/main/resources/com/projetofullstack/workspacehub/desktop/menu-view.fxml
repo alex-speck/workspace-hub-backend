@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.net.URL?>
 
 <StackPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.projetofullstack.workspacehub.desktop.controllers.MenuController">
     <stylesheets>
         <URL value="@style.css" />
     </stylesheets>
     <children>
-        <VBox alignment="CENTER" spacing="30" maxWidth="400" maxHeight="300" styleClass="card">
+        <VBox alignment="CENTER" maxHeight="300" maxWidth="400" spacing="30" styleClass="card">
             <children>
-                <Label text="Menu Principal" styleClass="title-label" />
+                <Label styleClass="title-label" text="Menu Principal" />
                 <Button onAction="#onCadastroUsuarioButtonClick" prefHeight="45.0" prefWidth="250.0" text="Cadastrar Usuário Admin" />
-                <Button onAction="#onVoltarButtonClick" prefWidth="250.0" text="Logout" styleClass="button-secondary" />
+                <Button layoutX="85.0" layoutY="138.0" onAction="#onCadastroPrimeiraEmpresaButtonClick" prefHeight="45.0" prefWidth="250.0" text="Cadastrar Primeira Empresa" />
+                <Button onAction="#onVoltarButtonClick" prefWidth="250.0" styleClass="button-secondary" text="Logout" />
             </children>
         </VBox>
     </children>

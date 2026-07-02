@@ -5,6 +5,8 @@ import com.projetofullstack.workspace_hub.infrastructure.exceptions.InvalidSessi
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.ResourceNotFoundException;
 import com.projetofullstack.workspace_hub.infrastructure.exceptions.StandardError;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<StandardError> validationError(MethodArgumentNotValidException e, HttpServletRequest request) {
@@ -32,6 +36,7 @@ public class GlobalExceptionHandler {
                 message,
                 request.getRequestURI()
         );
+        log.error(message, e);
         return ResponseEntity.status(status).body(err);
     }
 
@@ -45,6 +50,7 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 request.getRequestURI()
         );
+        log.error(e.getMessage(), e);
         return ResponseEntity.status(status).body(err);
     }
 
@@ -58,6 +64,7 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 request.getRequestURI()
         );
+        log.error(e.getMessage(), e);
         return ResponseEntity.status(status).body(err);
     }
 
@@ -71,6 +78,7 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 request.getRequestURI()
         );
+        log.error(e.getMessage(), e);
         return ResponseEntity.status(status).body(err);
     }
 
@@ -84,6 +92,7 @@ public class GlobalExceptionHandler {
                 e.getLocalizedMessage(),
                 request.getRequestURI()
         );
+        log.error(e.getMessage(), e);
         return ResponseEntity.status(status).body(err);
     }
 
@@ -97,6 +106,7 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 request.getRequestURI()
         );
+        log.error(e.getMessage(), e);
         return ResponseEntity.status(status).body(err);
     }
 }

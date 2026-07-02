@@ -39,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.startsWith("/usuarios/admin")
                 || path.startsWith("/auth/recuperar-senha")
                 || path.startsWith("/auth/alterar-senha")
+                || path.startsWith("/auth/cadastro/desktop")
                 || path.startsWith("/reservas/cancelar/")
                 || path.startsWith("/reservas/detalhes-cancelamento/")
         ){

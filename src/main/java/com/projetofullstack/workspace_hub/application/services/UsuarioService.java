@@ -52,6 +52,7 @@ public class UsuarioService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
+
     public boolean validarUsuarioSenha(LoginRequest request) {
         try {
             return repository.findByEmail(request.email())

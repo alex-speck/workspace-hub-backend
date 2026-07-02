@@ -1,9 +1,6 @@
 package com.projetofullstack.workspace_hub.presentation;
 
-import com.projetofullstack.workspace_hub.application.dto.request.LoginRequest;
-import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpresaRequest;
-import com.projetofullstack.workspace_hub.application.dto.request.UsuarioAlterarSenhaSolicitacao;
-import com.projetofullstack.workspace_hub.application.dto.request.UsuarioRecuperarSenha;
+import com.projetofullstack.workspace_hub.application.dto.request.*;
 import com.projetofullstack.workspace_hub.application.dto.response.LoginResponse;
 import com.projetofullstack.workspace_hub.application.services.EmpresaService;
 import com.projetofullstack.workspace_hub.application.services.TokenService;
@@ -42,10 +39,18 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+
     @PostMapping("/cadastro")
     @Operation(summary = "Cadastro de empresa", description = "Cadastra empresa e usuario padrã")
     public ResponseEntity<?> cadastrarEmpresa(@RequestBody RegistroEmpresaRequest request){
         empresaService.cadastrarEmpresa(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/cadastro/desktop")
+    @Operation(summary = "Cadastro da primeira empresa", description = "Cadastra a primeira empresa do sistema pela interface JavaFX")
+    public ResponseEntity<?> cadastrarEmpresaDesktop(@RequestBody RegistroEmpresaDesktopRequest request){
+        empresaService.cadastrarEmpresaDesktop(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

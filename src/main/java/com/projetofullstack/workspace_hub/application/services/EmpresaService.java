@@ -1,12 +1,16 @@
 package com.projetofullstack.workspace_hub.application.services;
 
 import com.projetofullstack.workspace_hub.application.dto.events.EnviarEmailEvent;
+import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpresaDesktopRequest;
 import com.projetofullstack.workspace_hub.application.dto.request.RegistroEmpresaRequest;
+import com.projetofullstack.workspace_hub.application.dto.response.BuscarCnpjResponse;
 import com.projetofullstack.workspace_hub.domain.entities.Empresa;
 import com.projetofullstack.workspace_hub.domain.entities.Usuario;
 import com.projetofullstack.workspace_hub.domain.enums.EmailTypes;
 import com.projetofullstack.workspace_hub.domain.repository.EmpresaRepository;
 import com.projetofullstack.workspace_hub.domain.valueobjects.CNPJ;
+import com.projetofullstack.workspace_hub.infrastructure.dto.BrasilApiResponse;
+import com.projetofullstack.workspace_hub.infrastructure.external.BrasilApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +39,9 @@ public class EmpresaService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Autowired
+    private BrasilApiClient brasilApiClient;
+
     @Transactional
     public void cadastrarEmpresa(RegistroEmpresaRequest request){
 
@@ -44,9 +51,9 @@ public class EmpresaService {
 
         Empresa empresa = new Empresa(request);
 
-        if (!verificarCNPJ(empresa.getCnpj().getValor())){
-            throw new IllegalArgumentException("Não existe empresa com esse CNPJ");
-        }
+        // busca dados da empresa, se der 404 significa que não existe empresa com esse CNPJ
+        // e lança exceção
+        buscarDadosEmpresa(empresa.getCnpj().toFormattedString());
 
         Usuario usuarioPadrao = new Usuario(request.usuarioPadrao(), empresa);
         usuarioPadrao.setRole("GESTOR");
@@ -65,6 +72,14 @@ public class EmpresaService {
         publicarEventoEmail(empresa);
     }
 
+    public void cadastrarEmpresaDesktop(RegistroEmpresaDesktopRequest request){
+        BuscarCnpjResponse dadosEmpresa = buscarDadosEmpresa(request.cnpj());
+
+        var empresa = new Empresa(request, dadosEmpresa);
+        empresa.criarUsuarioPadrao(request.email(), passwordEncoder.encode(request.senha()));
+        empresaRepository.save(empresa);
+    }
+
     private void publicarEventoEmail(Empresa empresa){
         applicationEventPublisher.publishEvent(new EnviarEmailEvent(
                 empresa.getEmail(),
@@ -79,25 +94,10 @@ public class EmpresaService {
         ));
     }
 
-    private boolean verificarCNPJ(String cnpj) {
-        try {
-            URL url = new URL("https://brasilapi.com.br/api/cnpj/v1/" + cnpj);
+    private BuscarCnpjResponse buscarDadosEmpresa(String cnpj){
+        BrasilApiResponse response = brasilApiClient.buscarEmpresaPorCNPJ(cnpj);
 
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setDoOutput(true);
-            conn.setConnectTimeout(3000);
-            conn.setReadTimeout(3000);
-
-
-            var code = conn.getResponseCode();
-            conn.disconnect();
-
-            return code == 200;
-        } catch (IOException e) {
-            return false;
-        }
-
+        return new BuscarCnpjResponse(response.getRazao_social(), response.getNome_fantasia());
     }
 
 

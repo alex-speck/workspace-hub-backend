@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.projetofullstack.workspacehub.desktop.controllers.EmpresaController">
+    <stylesheets>
+        <URL value="@style.css"/>
+    </stylesheets>
+    <children>
+        <VBox alignment="TOP_CENTER" maxHeight="450" maxWidth="600" spacing="20" styleClass="card">
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <Button onAction="#onVoltarButtonClick" styleClass="button-secondary" text="Voltar"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="title-label" text="Cadastro Admin"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <HBox spacing="20">
+                    <children>
+                        <VBox prefHeight="281.0" prefWidth="578.0" spacing="15" HBox.hgrow="ALWAYS">
+                            <children>
+                                <VBox spacing="5">
+                                    <Label text="CNPJ"/>
+                                    <TextField fx:id="txtCnpj" promptText="CNPJ da Empresa"/>
+                                </VBox>
+                                <VBox spacing="5">
+                                    <Label text="Email"/>
+                                    <TextField fx:id="txtEmail" promptText="E-mail de acesso"/>
+                                </VBox>
+                                <VBox spacing="5">
+                                    <Label text="Telefone"/>
+                                    <TextField fx:id="txtTelefone" promptText="(48) 9999-9999"/>
+                                </VBox>
+                                <VBox spacing="5">
+                                    <Label text="Senha"/>
+                                    <PasswordField fx:id="txtSenha"/>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="15" HBox.hgrow="ALWAYS"/>
+                    </children>
+                </HBox>
+
+                <Button onAction="#onCriarButtonClicked" prefWidth="250.0" text="Salvar Empresa"/>
+            </children>
+        </VBox>
+    </children>
+</StackPane>
